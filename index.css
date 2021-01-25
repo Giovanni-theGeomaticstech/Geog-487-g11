@@ -1,0 +1,62 @@
+/* This file focuses on comments for
+ the base index page for the website */
+
+ 
+ 
+
+ /* ///////////////////////////////////////////////////// */
+/* BODY */
+
+body, html {
+    height: 100%;
+    text-align: center;
+}
+
+
+/**********************************************************/
+/* CONTAINER CLASS */
+
+.container {
+    position: relative;
+    left: 30%; /* Pushes value to right */
+    top: 25%; /* Pushes value to right */
+
+    text-align: center;
+    background-color: whitesmoke;
+    /* border: 2px solid black;   */
+
+    border-top: 4px solid #93DB70;
+    width: 40%;
+    height: 50%;
+}
+
+/* layout-box CLASS */
+
+.layout-box {
+    position: relative;
+    top: 10%;
+
+    text-align: center;
+    display: inline-block;
+    background-color: #93DB70;
+    border: 1px solid #93DB70;
+    height: 40%;
+    width: 40%;
+}
+
+/* items CLASS */
+
+.items {
+    position: relative;
+    top:30%;
+}
+
+/* footer CLASS */
+
+.footer {
+    position: relative;
+    top: 15%;
+}
+
+
+/**********************************************************/
