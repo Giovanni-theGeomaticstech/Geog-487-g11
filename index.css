@@ -42,6 +42,8 @@ body, html {
     border: 1px solid #93DB70;
     height: 40%;
     width: 40%;
+
+    transition: 1.5s;
 }
 
 /* items CLASS */
@@ -58,5 +60,13 @@ body, html {
     top: 15%;
 }
 
+/* a tag styling*/
 
+a {
+    text-decoration: none;
+}
+
+a .layout-box:hover{
+    background-color: #49E20E;
+}
 /**********************************************************/
