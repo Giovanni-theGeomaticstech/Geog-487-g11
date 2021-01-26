@@ -28,16 +28,19 @@ const firebaseConfig = {
     appId: "1:86495474066:web:79594a6a19a33ec44ed14b",
     measurementId: "G-MDNH01Q427"
   };
+
   // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 
-let trial = document.getElementById("under");
-var ref = firebase.database().ref();                           
-ref.on("value", function(snapshot){
-    let output = JSON.stringify(snapshot.val(), null, 2);
-    trial.innerHTML = output
-});
+import { saveFeature, loadFeatures } from './database.js'
+
+// Calling the saveFeature
+let savedFeature = saveFeature({"x":1,"y":3}, "point")
+
+// Calling the saveFeature
+let loadSavedFeatures = loadFeatures('residence')
+
 
 // var rootRef = firebase.database().ref();
 // rootRef.once("value")
