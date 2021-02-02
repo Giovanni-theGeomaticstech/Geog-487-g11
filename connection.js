@@ -33,18 +33,52 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 
-import { saveFeature, loadFeatures } from './database.js'
+import { addFeature, loadFeatures, loadfeatureIDs } from './database.js'
+
+//////////////////////////////////////////////////////////////////////////////////
 
 // Calling the saveFeature
-let savedFeature = saveFeature({"x":1,"y":3}, "point")
+let savedFeature = addFeature("residence",{"ObjectID":10,"x":1,"y":4}, "polygon")
 
-// Calling the saveFeature
+// Calling the loadFeature
 let loadSavedFeatures = loadFeatures('residence')
+///////////////////////////////////////////////////////////////////////////////////
+
+// function deleteFeature (user_type, featureID)
+// Which also need to remove from the database
+
+export function deleteFeature(user_type, featureID){
+  //pass
+}
+
+//function listFeatures(user_type, type) 
+
+export function listFeatures(user_type, type){
+  let featureJson = loadFeatures(user_type, type)
+  //pass
+}
+
+//function listfeatureIDs(user_type, type)
+export function listfeatureIDs(user_type, type){
+  let featureIDJson = loadfeatureIDs(user_type, type)
+  //pass
+}
 
 
-// var rootRef = firebase.database().ref();
-// rootRef.once("value")
-//   .then(function(snapshot) {
-//     var key = snapshot.key; // null
-//     var childKey = snapshot.child("users/ada").key; // "ada"
-//   });
+export function updateFeature(user_type, feature_id, feature){
+  //pass
+  // this function is only called if the feature already exists in the database
+  // Just need to figure out how to update an already existing content
+  // Another way is to delete feature and add the new one
+}
+
+
+export function addNewFeature(user_type, feature, type){
+  addFeature(user_type, feature)
+}
+
+
+
+
+
+

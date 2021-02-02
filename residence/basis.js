@@ -84,7 +84,7 @@ let point_info =  {
             y: 43.6532
     },
     attributes: {
-            ObjectID: 1,
+            ObjectID: 100,
             Type: "point",
             Name: "TestPoint",
             Description: "Random Point",
@@ -156,7 +156,7 @@ let polygon_info = {
         }
     },
     attributes: {
-        ObjectID: 1,
+        ObjectID: 130,
         Type: "line",
         Name: "TestPolygon",
         Description: "Random Polygon",

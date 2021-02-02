@@ -1,9 +1,11 @@
 // Data Written: January 25, 2021
+// Last Updated: February 1, 2021
 // This file will contain Javascript Code
 // The Code will focus anything map related to the ArcGIS API for JAVASCRIPT
 // This file will focus on the residences
 
 import { fields, point_info, polyline_info, polygon_info, popupTemplate_info } from "./basis.js" // Importing our fields schema
+
 
 require([
     /* REQUIRE HOLDS ALL THE MODULES/LIBRARIES WE WILL BE USING */
@@ -113,12 +115,11 @@ require([
       // GRAPHICS
      //https://developers.arcgis.com/javascript/latest/add-a-point-line-and-polygon/
       
+     // THE GRAPHICS CODE LAYER IS PROBABLY NO LONGER NEEDED
       let graphicslayer = new GraphicsLayer()
       map.add(graphicslayer);
 
-      
 
-      //Now we create Graphic to add point
       // Note we take our graphic from Point Info
       let pointGraphic = new Graphic(point_info) 
 
@@ -145,11 +146,7 @@ require([
  
       // Listen to the click event on the map view.
       //https://www.esri.com/arcgis-blog/products/js-api-arcgis/mapping/find-graphics-under-a-mouse-click-with-the-arcgis-api-for-javascript/
-      view.popup.watch("visible", function(event){
-            console.log(view.popup)
-            console.log(view.popup.features)
-            console.log("here")
-      })
+      
    
       // view.on("click", function(event) {
       //       console.log(graphicslayer.graphics.items[0].geometry.type)
@@ -170,6 +167,21 @@ require([
 
       view.ui.add(sketch, "bottom-left");
 
+      // We can either use this as the editor tag
+      sketch.on("create", function(event) {
+            // check if the create event's state has changed to complete indicating
+            // the graphic create operation is completed.
+            if (event.state === "complete") {
+              // remove the graphic from the layer. Sketch adds
+              // the completed graphic to the layer by default.
+            //   graphicslayer.remove(event.graphic);
+                  console.log(event.graphic.geometry.type)
+          
+              // use the graphic.geometry to query features that intersect it
+            //   selectFeatures(event.graphic.geometry);
+            }
+      })
+
       ///////////////////////////////////////////////////////////////////
       // Feature Layer
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
@@ -177,7 +189,8 @@ require([
       // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=layers-featurelayer-collection-edits
       // I can access shape properties now
       // console.log(feature_layer.source.items[0].geometry.type)
- 
+        
+      // ADDING FEATURES TO THE POINTS FEATURE LAYER
       let feature_layer_points = new FeatureLayer({
             source: [pointGraphic], // Collection of Graphics
             fields: fields,
@@ -188,7 +201,7 @@ require([
           });
       map.add(feature_layer_points);
       
-
+      // ADDING FEATURES TO THE LINES FEATURE LAYER
       let feature_layer_lines = new FeatureLayer({
             source: [polylineGraphic], // Collection of Graphics
             fields: fields,
@@ -199,6 +212,7 @@ require([
           });
       map.add(feature_layer_lines);
 
+      // ADDING FEATURES TO THE POLYGON FEATURE LAYER
       let feature_layer_polygons = new FeatureLayer({
             source: [polygonGraphic], // Collection of Graphics
             fields: fields,
@@ -210,6 +224,7 @@ require([
       map.add(feature_layer_polygons);
       
 
+
       /////////////////////////////////////////////////////////////////
       // Probably best draw and edit feature layer
       // https://community.esri.com/t5/arcgis-api-for-javascript/can-i-draw-simple-geometries-and-save-them-as-features-on-my/td-p/120037
@@ -219,13 +234,99 @@ require([
       /////////////////////////////////////////////////////////////////
       // EDIT FEATURE DATA
      //https://developers.arcgis.com/javascript/latest/edit-feature-data/
+
       
      //Editor widget
      const editor = new Editor({
-            view: view
+            view: view,
+            allowedWorkflows: ["create","update"],
+            container: document.getElementById("editWidget"), // Edit widget is defined in the index.html
+            //layerInfos: if we do not want people to edit these layers specifically
       });
      // Add widget to the view
-     view.ui.add(editor, "top-right");
+//      view.ui.add(editor, "top-right"); // We would use this if we wanted to have this directly on our map layer
+
+      // Just like with Sketch widget we listened for the create maybe we can do similar stuff with the Editor
+      // We look on Methods
+      
+//      console.log(editor.hasEventListener("create"))
+      view.popup.watch("visible", function(event){
+            // console.log(view.popup)
+            // console.log(view.popup.features)
+            console.log("here")
+            if (editor.activeWorkflow != null){
+                  console.log(editor.activeWorkflow.data.edits) // Do not pass this
+                  console.log(editor.activeWorkflow.data.edits.attributesModified)
+                  console.log(editor.activeWorkflow.data.edits.geometryModified)
+                  console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // NOW THIS WORKS [geometry, attributes, symbol, popupTemplate]
+                  console.log(editor.activeWorkflow.data.edits._baselineGeometryJSON)
+                  console.log(editor.activeWorkflow.data.edits._baselineAttributesJSON)
+                  console.log(editor.activeWorkflow.data.edits.updatingHandles)
+                  console.log(editor.activeWorkflow.data.edits.modified)
+            }           
+      })
+
+      /////////////////////////////////////////////////////////////////
+
+      // We are going to send features 
+
+      // Here we are getting the event widget and we want to target
+      // The Update button (Update)
+      // The Delete Button (Delete)
+      // Add features button (Add)
+
+      // This is the feature which the user clicks
+      // We are going to use the attribute from it to target the other layers
+      let clicked_feature_attr; 
+
+      view.when(function(){
+            view.on("click", function(event){
+                  view.hitTest(event).then(function(response){
+                        clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
+                        console.log(clicked_feature_attr) // Gives me the currently clicked element
+                  })
+            })
+      })
+
+      let esri_widget = document.getElementById("editWidget")
+
+      esri_widget.onclick = function(event){
+            let current_widget_item = event.target
+            let info_update;
+
+            switch(current_widget_item.innerHTML){
+                  case "Update":
+                        info_update = "update"
+                        console.log("update")
+                        break
+                  case "Add":
+                        info_update = "add"
+                        console.log("add")
+                        break
+                  case "Delete":
+                        info_update = "delete"
+                        console.log("delete")
+                        break
+            }
+            let feature_id = clicked_feature_attr["ObjectID"]
+
+            // Some database function giving the feature ids list
+            // let id_list = database_ids(feature_type) //Maybe best to have this preloaded
+
+            // Some database function to storing the features database_updater(info_update, clicked_feature)
+
+
+      }
+      /////////////////////////////////////////////////////////////////
+
+      // Maybe I need this editing tool on the features
+      // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#EditingInfo
+      // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
+      // Best example to use
+      // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=editing-applyedits
+
+
+    
       
   }
   );
