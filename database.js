@@ -48,38 +48,54 @@ export function addFeature(user_type, feature, type=null){
 
 
 export function loadfeatureIDs(user_type){
-    let feature_types = ["point_ids", "polygon_ids", "line_ids"]
-    let featureIDs = {}
+    let featureIDs = {"point_ids":null, "polygon_ids":null, "line_ids":null}
 
-    for (let feature_type in feature_types){
+    for (let feature_type in featureIDs){
         let db_location_feature = user_type + "/" + feature_type
-        let ref = firebase.database().ref(db_location_feature);                           
-        ref.on("value", function(snapshot){
-            let output = JSON.stringify(snapshot.val(), null, 2);
+        let ref = firebase.database().ref(db_location_feature); 
+        // We Initialize a Promise here                          
+        featureIDs[feature_type] = ref.once("value").then(function(data){
+            // let output = JSON.stringify(data.val(), null, 2);
             // trial.innerHTML = output
-            featureIDs[feature_type] = snapshot.val()
+            return data.val()
         });
     }
-    return featureIDs 
+    return featureIDs
 }
 
 // The Purpose
 // The function loadFeatures loads data from the firebase database
 // An object with all the feature information 
 export function loadFeatures(user_type){
-    let feature_types = ["point", "polygon", "line"]
-    let features = {} 
+    // let feature_types = ["point", "polygon", "line"]
+    var features = {"point":null, "polygon":null, "line":null}
+    // let features = {} 
 
-    for (let feature_type in feature_types){
+    // for (let feature_type in features){
+    //     let db_location_feature = user_type + "/" + feature_type
+    //     let ref = firebase.database().ref(db_location_feature);                           
+    //     features[feature_type] = ref.on("value", function(data){
+    //         let output = JSON.stringify(data.val(), null, 2);
+    //         // trial.innerHTML = output
+    //         return data.val()
+    //     });
+    // }
+    for (let feature_type in features){
+
         let db_location_feature = user_type + "/" + feature_type
+
         let ref = firebase.database().ref(db_location_feature);                           
-        ref.on("value", function(snapshot){
-            let output = JSON.stringify(snapshot.val(), null, 2);
+        features[feature_type] = ref.once("value").then(function(data){
+            // let output = JSON.stringify(data.val(), null, 2);
             // trial.innerHTML = output
-            features[feature_type] = snapshot.val()
+            return data.val()
         });
     }
     return features
+}
+
+export function updateFeature(user_type, feature, type, feature_id){
+    //pass
 }
 
 // var rootRef = firebase.database().ref();

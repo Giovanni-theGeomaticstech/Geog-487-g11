@@ -8,6 +8,8 @@
 // https://dev.to/deammer/loading-environment-variables-in-js-apps-1p7p
 // https://medium.com/evenbit/getting-started-with-firebase-real-time-database-for-the-web-f53b527aae27
 // https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04
+// Promises Javascript
+// https://stackoverflow.com/questions/38884522/why-is-my-asynchronous-function-returning-promise-pending-instead-of-a-val
 // make sure we do sudo npm install -g firebase-tools
 // firebase login
 // firebase init
@@ -36,12 +38,11 @@ firebase.initializeApp(firebaseConfig);
 import { addFeature, loadFeatures, loadfeatureIDs } from './database.js'
 
 //////////////////////////////////////////////////////////////////////////////////
-
+// Test data
 // Calling the saveFeature
-let savedFeature = addFeature("residence",{"ObjectID":10,"x":1,"y":4}, "polygon")
+// let savedFeature = addFeature("residence",{"ObjectID":10,"x":1,"y":4}, "polygon")
 
-// Calling the loadFeature
-let loadSavedFeatures = loadFeatures('residence')
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 // function deleteFeature (user_type, featureID)
@@ -51,21 +52,50 @@ export function deleteFeature(user_type, featureID){
   //pass
 }
 
-//function listFeatures(user_type, type) 
 
+// We load the features of specific types
+// The return type is a promise feature
+// So call any function needed within the promise
 export function listFeatures(user_type, type){
-  let featureJson = loadFeatures(user_type, type)
-  //pass
+  let featureJson = loadFeatures(user_type)
+ 
+  // Idea is that this feature.json contains the data for polygon
+  // So just make this list here using Promise of the data
+  return featureJson[type].then(function(data){
+    let listOfFeatures = []
+    for (let feature in data){
+      listOfFeatures.push(data[feature])
+    }
+    // console.log(listOfFeatures)
+    return listOfFeatures
+  })
 }
+listFeatures("residence", "polygon")
 
-//function listfeatureIDs(user_type, type)
-export function listfeatureIDs(user_type, type){
-  let featureIDJson = loadfeatureIDs(user_type, type)
-  //pass
+// The Return is a Promise of ID's
+export function listFeatureIDs(user_type, type=null){
+  let featureIDJson = loadfeatureIDs(user_type)
+  return featureIDJson[type].then(function(data){
+    let listOfFeatureIDs = []
+    for (let featureID in data){
+      listOfFeatureIDs.push(data[featureID])
+    }
+    // console.log(listOfFeatureIDs)
+    return listOfFeatureIDs
+  })
 }
+listFeatureIDs("residence", "polygon_ids")
 
 
-export function updateFeature(user_type, feature_id, feature){
+export function updateExistingFeature(user_type, feature_id, feature){
+  promiseFeatureIDs = listFeatureIDs(user_type, feature["geometry"][type])
+  promiseFeatureIDs.then(function(data){
+    if(data.includes(feature_id)){
+      // find the feature by the key
+    }else{
+      // Feature does not exists
+    }
+  })
   //pass
   // this function is only called if the feature already exists in the database
   // Just need to figure out how to update an already existing content
@@ -74,7 +104,14 @@ export function updateFeature(user_type, feature_id, feature){
 
 
 export function addNewFeature(user_type, feature, type){
-  addFeature(user_type, feature)
+  // Basically we want to call that Add Feature function in our connection .js
+  if (feature){
+    // Add in a functionality for a pop up of feature saved
+    return addFeature(user_type, feature, type)
+  }
+  else{
+    alert("Check your Feature")
+  }
 }
 
 
