@@ -5,6 +5,7 @@
 // This file will focus on the residences
 
 import { fields, point_info, polyline_info, polygon_info, popupTemplate_info } from "./basis.js" // Importing our fields schema
+import { } from "../connection.js" // importing our database tools
 
 
 require([
