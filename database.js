@@ -1,5 +1,5 @@
 // Date written: January 25, 2021
-// Last update: February 1, 2021
+// Last update: February 5, 2021
 // File Purpose: Set up Firebase Database connection
 
 // This file serves as the general firebase database connection
@@ -21,6 +21,8 @@ function addfeatureID(user_type, feature_id, type=null){
     let db_location_feature = user_type + "/" + type
     let featureRef = firebase.database().ref(db_location_feature)
     let featureInfo = featureRef.push(feature_id);
+    console.log("addFeatureID")
+
 }
 
 //Saving Data from Features into firebase
@@ -34,15 +36,7 @@ export function addFeature(user_type, feature, type=null){
 
     // As we add a feature we add its contents
     addfeatureID(user_type, feature["ObjectID"], type)
-
-    // switch (type){
-    //     case 'point':
-    //         //pass
-    //     case 'polyline':
-    //         //pass
-    //     case 'polygon':
-    //         //pass
-    // } 
+    console.log("addFeatures")
 }
 
 export function loadfeatureIDs(user_type){
@@ -58,6 +52,8 @@ export function loadfeatureIDs(user_type){
             return data.val()
         });
     }
+    console.log("loadFeaturesIds")
+
     return featureIDs
 }
 
@@ -89,12 +85,22 @@ export function loadFeatures(user_type){
             return data.val()
         });
     }
+    console.log("loadFeatures")
+
     return features
 }
 
-export function updateFeature(user_type, feature, type, objectKey){
+export function updateFeature(user_type, feature, feature_type, objectKey){
+    let db_location_feature = user_type + "/" + feature_type
+    let ref = firebase.database().ref(db_location_feature)
+    console.log("updateFeature")
 
-    //pass
+    /* GIO NOTES
+    Gio: Add a last updated field
+    February 5
+    */
+
+    ref.child(objectKey).update(feature) // Update child
 }
 
 // Note 
@@ -102,7 +108,9 @@ export function deleteDbFeature(user_type, feature_type, objectKey){
     let db_location_feature = user_type + "/" + feature_type
     let ref = firebase.database().ref(db_location_feature)
     ref.child(objectKey).remove(); // remove specific key
-    //pass
+
+    console.log("deleteFeatures")
+
 }
 
 // var rootRef = firebase.database().ref();

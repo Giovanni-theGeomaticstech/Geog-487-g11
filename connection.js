@@ -1,4 +1,5 @@
 // Date written: January 25, 2021
+// Last update: February 5, 2021
 // File Purpose: Set up Firebase connection
 
 // This file serves as the general firebase connection
@@ -35,18 +36,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 
-import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature } from './database.js'
-
-//////////////////////////////////////////////////////////////////////////////////
-// Test data
-// Calling the saveFeature
-// let savedFeature = addFeature("residence",{"ObjectID":10,"x":1,"y":4}, "polygon")
-
-
-///////////////////////////////////////////////////////////////////////////////////
-
-
-
+import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
 // We are going to use this function to firebase object keys
 // The function will return the Firebase Object key of a feature
@@ -81,6 +71,8 @@ function firebaseOjectKey(user_type, type, indexID){
 // firebaseOjectKey("residence", "polygon_ids", 3)
 
 
+///////////////////////////////////////////////////////////////////////////////////
+
 // function deleteFeature (user_type, featureID)
 // Which also need to remove from the database
 
@@ -96,7 +88,7 @@ export function deleteFeatureObject(user_type, type, featureID){
     console.log("You need to pass in ID data")
     return
   }
-  
+
   let featureIDsArrPromise = listFeatureIDs(user_type, type)
 
   return featureIDsArrPromise.then(function(featureIDsArr){
@@ -122,10 +114,52 @@ export function deleteFeatureObject(user_type, type, featureID){
     return "Feature Does not Exists"
 })
 }
+// deleteFeatureObject("residence", "polygon_ids", 13)
 
-deleteFeatureObject("residence", "polygon", 13)
+///////////////////////////////////////////////////////////////////////////////////
+
+// The update Existing Feature is used to update features that we have in the DB
+
+// Note A feature is passed directly from the front 
+export function updateExistingFeature(user_type, featureID, feature){
+  let type_feature = feature["geometry"]["type"]
+  let type = type_feature + "_ids"
+  let featureIDsArrPromise = listFeatureIDs(user_type, type)
+
+  return featureIDsArrPromise.then(function(featureIDsArr){
+    // We check if the feature ID is the Feature ID list
+    if (featureIDsArr.includes(featureID)){
+      let objectIndex = featureIDsArr.indexOf(featureID)
+      
+      //  Update ID
+      // let objectKeyPromise_id = firebaseOjectKey(user_type, type, objectIndex) // We get the Object Key in db
+      // objectKeyPromise_id.then(function(objectKey){
+      //   console.log("Key ID " + objectKey)
+      //   deleteDbFeature(user_type, type, objectKey) // We delete from DB
+      // })
+
+      // Update Feature
+      let objectKeyPromise_feature = firebaseOjectKey(user_type, type_feature, objectIndex) // We get the Object Key in db
+      objectKeyPromise_feature.then(function(objectKeyFeature){
+        console.log("Key ID Feature" + objectKeyFeature)
+        updateFeature(user_type, feature, type_feature , objectKeyFeature) // We delete from DB
+      })
+    }
+    return "Feature Does not Exists"
+})
+}
+
+// let test_geom = {"ObjectID":15, "geometry":
+// {
+//   "type":"polygon",
+//   "x":2009,
+//   "y":4
+// }
+// }
+// updateExistingFeature("residence", 15, test_geom)
 
 
+///////////////////////////////////////////////////////////////////////////////////
 
 // We load the features of specific types
 // The return type is a promise feature
@@ -144,7 +178,7 @@ export function listFeatures(user_type, type){
     return listOfFeatures
   })
 }
-listFeatures("residence", "polygon")
+// listFeatures("residence", "polygon")
 
 // The Return is a Promise of ID's
 export function listFeatureIDs(user_type, type=null){
@@ -158,24 +192,10 @@ export function listFeatureIDs(user_type, type=null){
     return listOfFeatureIDs
   })
 }
-listFeatureIDs("residence", "polygon_ids")
+// listFeatureIDs("residence", "polygon_ids")
 
 
-export function updateExistingFeature(user_type, feature_id, feature){
-  promiseFeatureIDs = listFeatureIDs(user_type, feature["geometry"][type])
-  promiseFeatureIDs.then(function(data){
-    if(data.includes(feature_id)){
-      // find the feature by the key
-    }else{
-      // Feature does not exists
-    }
-  })
-  //pass
-  // this function is only called if the feature already exists in the database
-  // Just need to figure out how to update an already existing content
-  // Another way is to delete feature and add the new one
-}
-
+///////////////////////////////////////////////////////////////////////////////////
 
 export function addNewFeature(user_type, feature, type){
   // Basically we want to call that Add Feature function in our connection .js
@@ -184,10 +204,11 @@ export function addNewFeature(user_type, feature, type){
     return addFeature(user_type, feature, type)
   }
   else{
-    alert("Check your Feature")
+    console.log("There is no data in the feature")
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////////
 
 
 
