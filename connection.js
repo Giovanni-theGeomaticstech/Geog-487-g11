@@ -35,7 +35,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 
-import { addFeature, loadFeatures, loadfeatureIDs } from './database.js'
+import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature } from './database.js'
 
 //////////////////////////////////////////////////////////////////////////////////
 // Test data
@@ -45,12 +45,86 @@ import { addFeature, loadFeatures, loadfeatureIDs } from './database.js'
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+
+
+
+// We are going to use this function to firebase object keys
+// The function will return the Firebase Object key of a feature
+// Function assumes field in the database
+// Have a check for null
+
+function firebaseOjectKey(user_type, type, indexID){
+  let  featureIdJson; 
+  // We use ids
+
+  if (type.search("_ids") > 0){ // If item in string 1 , -1 not in string
+    featureIdJson = loadfeatureIDs(user_type)
+  } else { // We use the other the base load features
+    featureIdJson = loadFeatures(user_type)
+  }
+  
+  return featureIdJson[type].then(function(data){
+    let i = 0 // starting index
+    let objectKey;
+    for (let featureID in data){
+      if (i == indexID){
+        objectKey = featureID
+        break
+      }
+      ++i
+    }
+    console.log(objectKey)
+    return objectKey
+  })
+}
+// firebaseOjectKey("residence", "polygon", 1)
+// firebaseOjectKey("residence", "polygon_ids", 3)
+
+
 // function deleteFeature (user_type, featureID)
 // Which also need to remove from the database
 
-export function deleteFeature(user_type, featureID){
-  //pass
+// We take feature id 
+// We look for the index of that feature in firebase database feature IDs
+// Then we take this information and get the key of item at index
+// Note only id based data is passed here 
+// Thus it must be `obj`+ `_ids`
+
+export function deleteFeatureObject(user_type, type, featureID){
+
+  if (type.search("_ids") < 0){
+    console.log("You need to pass in ID data")
+    return
+  }
+  
+  let featureIDsArrPromise = listFeatureIDs(user_type, type)
+
+  return featureIDsArrPromise.then(function(featureIDsArr){
+    // We check if the feature ID is the Feature ID list
+    if (featureIDsArr.includes(featureID)){
+      let objectIndex = featureIDsArr.indexOf(featureID)
+      let type_feature = type.slice(0, (type.length) - 4) // remove "_ids"
+      
+      // Delete ID
+      let objectKeyPromise_id = firebaseOjectKey(user_type, type, objectIndex) // We get the Object Key in db
+      objectKeyPromise_id.then(function(objectKey){
+        console.log("Key ID " + objectKey)
+        deleteDbFeature(user_type, type, objectKey) // We delete from DB
+      })
+
+      // Delete Feature
+      let objectKeyPromise_feature = firebaseOjectKey(user_type, type_feature, objectIndex) // We get the Object Key in db
+      objectKeyPromise_feature.then(function(objectKeyFeature){
+        console.log("Key ID Feature" + objectKeyFeature)
+        deleteDbFeature(user_type, type_feature , objectKeyFeature) // We delete from DB
+      })
+    }
+    return "Feature Does not Exists"
+})
 }
+
+deleteFeatureObject("residence", "polygon", 13)
+
 
 
 // We load the features of specific types
@@ -66,7 +140,7 @@ export function listFeatures(user_type, type){
     for (let feature in data){
       listOfFeatures.push(data[feature])
     }
-    // console.log(listOfFeatures)
+    console.log(listOfFeatures)
     return listOfFeatures
   })
 }
@@ -80,7 +154,7 @@ export function listFeatureIDs(user_type, type=null){
     for (let featureID in data){
       listOfFeatureIDs.push(data[featureID])
     }
-    // console.log(listOfFeatureIDs)
+    console.log(listOfFeatureIDs)
     return listOfFeatureIDs
   })
 }

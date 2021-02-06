@@ -45,8 +45,6 @@ export function addFeature(user_type, feature, type=null){
     // } 
 }
 
-
-
 export function loadfeatureIDs(user_type){
     let featureIDs = {"point_ids":null, "polygon_ids":null, "line_ids":null}
 
@@ -94,7 +92,16 @@ export function loadFeatures(user_type){
     return features
 }
 
-export function updateFeature(user_type, feature, type, feature_id){
+export function updateFeature(user_type, feature, type, objectKey){
+
+    //pass
+}
+
+// Note 
+export function deleteDbFeature(user_type, feature_type, objectKey){
+    let db_location_feature = user_type + "/" + feature_type
+    let ref = firebase.database().ref(db_location_feature)
+    ref.child(objectKey).remove(); // remove specific key
     //pass
 }
 

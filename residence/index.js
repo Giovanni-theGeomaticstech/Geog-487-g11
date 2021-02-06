@@ -283,7 +283,7 @@ require([
             view.on("click", function(event){
                   view.hitTest(event).then(function(response){
                         clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
-                        console.log(clicked_feature_attr) // Gives me the currently clicked element
+                        // console.log(clicked_feature_attr) // Gives me the currently clicked element
                   })
             })
       })
