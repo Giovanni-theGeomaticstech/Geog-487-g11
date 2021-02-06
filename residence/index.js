@@ -5,7 +5,8 @@
 // This file will focus on the residences
 
 import { fields, point_info, polyline_info, polygon_info, popupTemplate_info } from "./basis.js" // Importing our fields schema
-import { } from "../connection.js" // importing our database tools
+
+import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs} from "../connection.js" // importing our database tools
 
 
 require([
@@ -269,7 +270,7 @@ require([
 
       /////////////////////////////////////////////////////////////////
 
-      // We are going to send features 
+      // THIS PORTION DEALS WITH SENDING DATA OVER
 
       // Here we are getting the event widget and we want to target
       // The Update button (Update)
@@ -280,43 +281,51 @@ require([
       // We are going to use the attribute from it to target the other layers
       let clicked_feature_attr; 
 
+      // When A user clicks on item on the view we target the object id
       view.when(function(){
             view.on("click", function(event){
                   view.hitTest(event).then(function(response){
-                        clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
-                        // console.log(clicked_feature_attr) // Gives me the currently clicked element
+                        if (response.results[0]){
+                              clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
+                              console.log(clicked_feature_attr) // Gives me the currently clicked element
+                        }    
                   })
             })
       })
 
+      // Here we target the widget storing the add, update and delete feature
       let esri_widget = document.getElementById("editWidget")
 
       esri_widget.onclick = function(event){
             let current_widget_item = event.target
             let info_update;
+            let feature_id = clicked_feature_attr["ObjectID"]
+
 
             switch(current_widget_item.innerHTML){
                   case "Update":
                         info_update = "update"
-                        console.log("update")
+                        // updateExistingFeature("residence", feature_id, null)
                         break
                   case "Add":
                         info_update = "add"
-                        console.log("add")
+                        // addNewFeature("residence", null, null)
                         break
                   case "Delete":
                         info_update = "delete"
-                        console.log("delete")
+                        deleteFeatureObject("residence", null, feature_id)
                         break
             }
-            let feature_id = clicked_feature_attr["ObjectID"]
+            console.log(feature_id)
 
-            // Some database function giving the feature ids list
-            // let id_list = database_ids(feature_type) //Maybe best to have this preloaded
+      }
 
-            // Some database function to storing the features database_updater(info_update, clicked_feature)
+      /// For Add feature we need a check to say the feature is not already in DB
+      // Update Feature we need the new feature and the type
+      // While delete feature we need the type of feature
 
-
+      function returnFeature(){
+            //pass
       }
       /////////////////////////////////////////////////////////////////
 
