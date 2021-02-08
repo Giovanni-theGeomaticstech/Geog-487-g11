@@ -55,7 +55,8 @@ require([
         var view = new MapView({
         container: "viewDiv", //We define viewDiv is what holds our div
         map: map,
-        center: [-79.3832,43.6532], // Center at toronto now
+      //   center: [-79.3832,43.6532], // Center at toronto now
+        center: [-79.210724,45.32424], // Center at toronto now
         zoom: 15
         });
         //////////////////////////////////////////////////////////////
@@ -376,8 +377,41 @@ require([
       // Best example to use
       // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=editing-applyedits
 
+      /********************
+       * Add feature layer From Gabby
+       * 
+       * The function loadOnlineFeatLayers adds the ArcGIS online Feature layers
+       * Load in predefined layers
+       ********************/
+      
 
+      function loadOnlineFeatLayers(){
+            // Huntsville Boundary item 1
+            let huntsvilleLayers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",]
+
+            for (let i = 0; i < huntsvilleLayers.length; i++){
+                  var newfeatureLayer = new FeatureLayer({
+                        url: huntsvilleLayers[i]
+                  });
+                  map.add(newfeatureLayer)
+            }    
+      }
+      loadOnlineFeatLayers()
+      
+      /********************
+       * Add feature layer From Gabby
+       * 
+       * Load in layers from user input
+       ********************/
+
+      function loadOFeatLayersRemotely(url){
+            var newfeatureLayer = new FeatureLayer({
+                  url: url
+            });
+            map.add(newfeatureLayer) 
+      }
+      // loadOFeatLayersRemotely("something")
     
       
   }
-  );
+);
