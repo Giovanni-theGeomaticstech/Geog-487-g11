@@ -28,29 +28,53 @@
         var view = new MapView({
           container: "viewDiv",
           map: map,
+          center: [-79.210724,45.32424], // Center at toronto now
+          zoom: 15
 
-          extent: {
-            // autocasts as new Extent()
-            xmin: -79.599875,
-            ymin: 45.466265,
-            xmax: -78.881296,
-            ymax: 45.144809,
-            spatialReference: 102100
-          }
+          // extent: {
+          //   // autocasts as new Extent()
+          //   xmin: -79.599875,
+          //   ymin: 45.466265,
+          //   xmax: -78.881296,
+          //   ymax: 45.144809,
+          //   spatialReference: 102100
+          // }
         });
 
-        /********************
-         * Add feature layer
-         ********************/
-
-        // Huntsville Boundary 
-       // let Huntsville_Layers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",]
-        var featureLayer = new FeatureLayer({
-          url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer"
-        });
-        map.add(featureLayer)
-        ;
-      });
+         /********************
+       * Add feature layer From Gabby
+       * 
+       * The function loadOnlineFeatLayers adds the ArcGIS online Feature layers
+       * Load in predefined layers
+       ********************/
+      
+     function loadOnlineFeatLayers(){
+          // Huntsville Boundary item 1
+            let huntsvilleLayers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",]
+            for (let i = 0; i < huntsvilleLayers.length; i++){
+                  var newfeatureLayer = new FeatureLayer({
+                        url: huntsvilleLayers[i]
+                  });
+                  map.add(newfeatureLayer)
+            }    
+      }
+      loadOnlineFeatLayers()
+      
+      /********************
+       * Add feature layer From Gabby
+       * 
+       * Load in layers from user input
+       ********************/
+       // Make an Input Box for this
+      function loadOFeatLayersRemotely(url){
+            var newfeatureLayer = new FeatureLayer({
+                  url: url
+            });
+            map.add(newfeatureLayer) 
+      }
+      // loadOFeatLayersRemotely("something")
+        
+      });
       
     </script>
     
