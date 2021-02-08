@@ -199,6 +199,8 @@ export function listFeatureIDs(user_type, type=null){
 
 export function addNewFeature(user_type, feature, type){
   // Basically we want to call that Add Feature function in our connection .js
+  console.log("add feature")
+  console.log(feature)
   if (feature){
     // Add in a functionality for a pop up of feature saved
     return addFeature(user_type, feature, type)

@@ -201,6 +201,8 @@ require([
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
+      feature_layer_points.refreshInterval = 0.2; //Set the interval to 1 minute
+
       map.add(feature_layer_points);
       
       // ADDING FEATURES TO THE LINES FEATURE LAYER
@@ -256,6 +258,7 @@ require([
             // console.log(view.popup)
             // console.log(view.popup.features)
             console.log("here")
+            // we can move this from here now
             if (editor.activeWorkflow != null){
                   console.log(editor.activeWorkflow.data.edits) // Do not pass this
                   console.log(editor.activeWorkflow.data.edits.attributesModified)
@@ -293,30 +296,68 @@ require([
             })
       })
 
+
       // Here we target the widget storing the add, update and delete feature
       let esri_widget = document.getElementById("editWidget")
-
+      
       esri_widget.onclick = function(event){
+            // We have to load features in here to make sure it fully loads
+            console.log(feature_layer_points.source.items) // Here we get the feature list
+            console.log(feature_layer_points.geometryType)
+            //https://support.esri.com/en/technical-article/000013384
+
             let current_widget_item = event.target
             let info_update;
-            let feature_id = clicked_feature_attr["ObjectID"]
+            let feature_info;
 
-
+            let feature_id;
+            // Note this caused problems !!!
+            
             switch(current_widget_item.innerHTML){
                   case "Update":
                         info_update = "update"
-                        // updateExistingFeature("residence", feature_id, null)
+                        feature_info = editor.activeWorkflow.data.edits.feature.toJSON()
+                        feature_id = clicked_feature_attr["ObjectID"];
+                        console.log(feature_info) // Leave this here for new info
+                        // updateFeatureLayer("residence", feature_id, null)
                         break
                   case "Add":
                         info_update = "add"
-                        // addNewFeature("residence", null, null)
+                        // console.log(feature_layer_points.source.items)
+
+                        feature_info = editor.activeWorkflow.data.edits.feature.toJSON() 
+                        feature_info.attributes["ObjectID"] = 103;
+                        
+                        if (feature_info.geometry.rings){
+                              feature_info.attributes["Type"] = "polygon"
+                              feature_info.geometry["type"] = "polygon"
+                              // We have polygon
+                        }
+                        else if(feature_info.geometry.paths){
+                              feature_info.attributes["Type"] = "line"
+                              feature_info.geometry["type"] = "polyline"
+                        }
+                        else{
+                              feature_info.attributes["Type"] = "point"
+                              feature_info.geometry["type"] = "point"
+                        }
+                        console.log(feature_info)
+                        
+                        // Note need to make sure we update feature layer too
+                        // addFeatureLayer("residence",null, null)
+                        addNewFeature("residence", feature_info, feature_info.attributes["Type"])
+                        // Might be the hardest to do
+                        // Tricky gotta figure out where the layer is
+
                         break
                   case "Delete":
                         info_update = "delete"
-                        deleteFeatureObject("residence", null, feature_id)
+                        console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // So this does work
+                        feature_id = clicked_feature_attr["ObjectID"];
+                        // deleteFeatureLayer("residence", null, feature_id)
                         break
             }
-            console.log(feature_id)
+            // console.log(feature_id)
 
       }
 
