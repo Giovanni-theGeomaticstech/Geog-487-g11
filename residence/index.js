@@ -552,14 +552,19 @@ require([
        * Load in layers from user input
        ********************/
 
-      function loadOFeatLayersRemotely(url){
-            var newfeatureLayer = new FeatureLayer({
-                  url: url
-            });
-            map.add(newfeatureLayer) 
+      let search_btn = document.getElementById("search_btn_url")
+      search_btn.onclick = function(){
+            
+            let url = document.getElementById("url_info").value
+            // Need to check for mapservice stuff
+            if (url){
+                  var newfeatureLayer = new FeatureLayer({
+                        url: url
+                  });
+                  map.add(newfeatureLayer)
+            } 
       }
-      // loadOFeatLayersRemotely("something")
-    
+ 
       
   }
 );

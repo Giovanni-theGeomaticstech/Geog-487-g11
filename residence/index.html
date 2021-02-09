@@ -9,7 +9,10 @@
     <!-- CSS-->
     <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/css/main.css">
     <link rel="stylesheet" href="index.css">
-
+    <!--For our Search Bar CSS-->
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <!--Database Content-->
     <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-database.js"></script>
@@ -17,6 +20,7 @@
     <!--JAVASCRIPT-->
     <script src="https://js.arcgis.com/4.18/"></script>
     <script type="module" src="index.js"></script>
+    
 
     
     
@@ -24,18 +28,35 @@
 </head>
 <body>
     <div class="layerContainer">
+
+        
        
         <!--Adding the editor widget to the map-->
         <div id="editWidget" class="aligned"></div>
         
         <!-- Adding our map to the page-->
         <div id = "maparea" class="aligned"><div id="viewDiv"></div></div>
+
+        <!-- Search Bar -->
         
+        
+    </div>
+    <div class="search-container">
+        <div class="row height d-flex justify-content-center align-items-center">
+            <div class="col-md-8">
+                <div class="search"> <input id="url_info" type="text" class="form-control" placeholder="Have a question? Ask Now"> 
+                    <button id="search_btn_url" class="btn btn-primary search_btn"><i class="fa fa-search font_awesome_search"></i> </button> 
+                </div>
+            </div>
+        </div>
     </div>
     
 </body>
 <!-- I want this to load later-->
 <script type="module" src = "/connection.js"></script>
+<!--For our Search Bar JS-->
+ <!-- <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js'></script> -->
+
 
 
 </html>
