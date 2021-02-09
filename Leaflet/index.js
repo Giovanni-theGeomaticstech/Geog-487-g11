@@ -82,9 +82,10 @@ var map = L.map('map').setView([45.32424,-79.210724], 12);
 			if (type === 'marker') {
                 // We can manipulate the information based on html tags
                 // We need to think of the meta data aspect ???
-				layer.bindPopup(' <h1>Head Information</h1> + <p>Wah gwaan</p?');
+				layer.bindPopup('<h1>Head Information</h1> + <p>Wah gwaan</p?');
 			}
             
+			alert("<input type='text'>")
             console.log(layer)
 			drawnItems.addLayer(layer);
 		});
