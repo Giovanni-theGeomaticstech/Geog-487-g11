@@ -5,7 +5,6 @@
 /* This is the for the initial page styling */
 
 html, body{
-    padding: 1px;
     margin: 0;
     height: 100%;
     width: 100%;
@@ -37,7 +36,7 @@ html, body{
   #maparea{
     position: relative;
     /* float:right; */
-    height: 80%;
+    height: 70%;
     width: 48%;
     /* border: 1px solid red; */
   }
@@ -50,7 +49,7 @@ html, body{
   #editWidget{
     float: left;
     position: relative;
-    height: 50%;
+    height: 70%;
     width: 25%;
   }
 
@@ -62,60 +61,8 @@ html, body{
   /*************************************************************/
 
 
-  /*************************************************************/
-  /* FOR THE SEARCH BAR */
-  /*https://bbbootstrap.com/snippets/bootstrap-search-box-input-icons-inside-88211241*/
-  /* Code Modified */
-  .search {
-    position: relative;
-    box-shadow: 0 0 40px rgba(51, 51, 51, .1);
-    /* border: 1px solid black; */
-    width: 50%
-}
-
-.search input {
-    height: 60px;
-    text-indent: 25px;
-    border: 2px solid #d6d4d4;
-    width: 80%;
-}
-
-.search input:focus {
-    box-shadow: none;
-    border: 2px solid greenyellow;
-}
-
-.search .fa-search {
-    position: absolute;
-    top: 20px;
-    left: 16px
-}
-
-.search button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width:15%;
-    height:90%;
-    /* background: greenyellow */
-}
-
-.search_btn{
-  text-align: center;
-}
-
-.font_awesome_search{
-  color: black;
-  font-size: 35px;
-  position: relative;
-  top: 15% !important;
-  transition: 1s;
-}
-
-.font_awesome_search:hover{
-  color: green;
-}
-
-
+  
 
   /*************************************************************/
+
+ 

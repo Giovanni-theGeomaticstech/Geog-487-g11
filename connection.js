@@ -21,11 +21,33 @@
 // require('firebase/database');
 //Consider doing this later
 
+// This is going to tell the server to call anything that is .env 
+// https://www.youtube.com/watch?v=17UVejOw3zA
+
+
+// require('dotenv').config( {
+//       path: path.join(__dirname, '.env')
+//   });
+// console.log(process.env)
+
+// Note this File is the connection path for the DB
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDEbPCl-DqP0Au6z0ojUqCyP3bD9JitAdY",
+  authDomain: "sample-c4b1e.firebaseapp.com",
+  databaseURL: "https://sample-c4b1e.firebaseio.com",
+  projectId: "sample-c4b1e",
+  storageBucket: "sample-c4b1e.appspot.com",
+  messagingSenderId: "86495474066",
+  appId: "1:86495474066:web:79594a6a19a33ec44ed14b",
+  measurementId: "G-MDNH01Q427"
+};
+
 
   // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
-
+//button id =search_btn_url
 import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
 

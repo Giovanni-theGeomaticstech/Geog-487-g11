@@ -1,0 +1,25 @@
+{
+  "name": "geog-487-g11",
+  "version": "1.0.0",
+  "description": "For the 487 project",
+  "main": "connection.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Giovanni-theGeomaticstech/Geog-487-g11.git"
+  },
+  "author": "Giovanni Harvey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Giovanni-theGeomaticstech/Geog-487-g11/issues"
+  },
+  "homepage": "https://github.com/Giovanni-theGeomaticstech/Geog-487-g11#readme"
+}

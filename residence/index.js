@@ -42,11 +42,14 @@ require([
     // Editor
     "esri/widgets/Editor",
 
+    //NodeJs
+//     "dojo/node!dotenv"
+
   ], 
   /* NOW THE FUNCTION IS WHERE WE ADD THESE LIBRARIES*/
   /* I believe within in this function we will write all or JS code*/
   function(Map, MapView, BasemapToggle,BasemapGallery, Track, Locate, Search, PopupTemplate, 
-      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor) { 
+      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, ) { //dotenv
 
         /////////////////////////////////////////////////////////////
         // SETTING UP OUR MAP LAYER
@@ -535,7 +538,14 @@ require([
 
       function loadOnlineFeatLayers(){
             // Huntsville Boundary item 1
-            let huntsvilleLayers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",]
+            let huntsvilleLayers = [
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
+            ]
 
             for (let i = 0; i < huntsvilleLayers.length; i++){
                   var newfeatureLayer = new FeatureLayer({
@@ -544,7 +554,7 @@ require([
                   map.add(newfeatureLayer)
             }    
       }
-      loadOnlineFeatLayers()
+      // loadOnlineFeatLayers()
       
       /********************
        * Add feature layer From Gabby
@@ -557,13 +567,21 @@ require([
             
             let url = document.getElementById("url_info").value
             // Need to check for mapservice stuff
-            if (url){
+            // Sample Url
+            //https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer
+            if (url && url.includes("https://services1.arcgis.com/") && url.includes("FeatureServer")){
                   var newfeatureLayer = new FeatureLayer({
                         url: url
                   });
                   map.add(newfeatureLayer)
-            } 
+                  alert("Layer was successfully added")
+            }  else{
+                  alert("Layer with url:" + url + " does not exists!")
+            }
       }
+
+      //Filter Feature Layer
+      //https://developers.arcgis.com/javascript/latest/api-reference/esri-views-layers-support-FeatureFilter.html
  
       
   }

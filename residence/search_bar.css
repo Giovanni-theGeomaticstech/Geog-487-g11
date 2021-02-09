@@ -1,0 +1,99 @@
+/*************************************************************/
+  /* FOR THE SEARCH BAR */
+  /*https://bbbootstrap.com/snippets/bootstrap-search-box-input-icons-inside-88211241*/
+  /* Code Modified */
+  .search {
+    position: relative;
+    box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+    /* border: 1px solid black; */
+    width: 50%
+}
+
+.search input {
+    height: 60px;
+    text-indent: 25px;
+    border: 2px solid #d6d4d4;
+    width: 80%;
+}
+
+.search input:focus {
+    box-shadow: none;
+    border: 2px solid greenyellow;
+}
+
+.search .fa-search {
+    position: absolute;
+    top: 20px;
+    left: 16px
+}
+
+.search button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width:15%;
+    height:90%;
+    /* background: greenyellow */
+}
+
+.search_btn{
+  text-align: center;
+}
+
+.font_awesome_search{
+  color: black;
+  font-size: 35px;
+  position: relative;
+  top: 15% !important;
+  transition: 1s;
+}
+
+.font_awesome_search:hover{
+  color: green;
+}
+
+
+  /*************************************************************/
+  /* New Search Bar*/
+  /* W3 search bar*/
+
+  * {
+    box-sizing: border-box;
+  }
+
+  #search_form{
+      margin-top: 10px !important;
+      margin-bottom: 20% !important; /* We use this to push down the top element*/
+      /* border: 2px solid black; */
+  } 
+  
+  div.example input[type=text] {
+    padding: 10px;
+    font-size: 17px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+    background: white;
+  }
+  
+  div.example button {
+    float: left;
+    width: 20%;
+    padding: 10px;
+    background: #2196F3;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none;
+    cursor: pointer;
+  }
+  
+  div.example button:hover {
+    background: #0b7dda;
+  }
+  
+  div.example::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
