@@ -50,7 +50,13 @@
       
      function loadOnlineFeatLayers(){
           // Huntsville Boundary item 1
-            let huntsvilleLayers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",]
+            let huntsvilleLayers = ["https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
+                                    "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
+                                    "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
+                                    "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
+                                    "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
+                                    "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"]
+                            
             for (let i = 0; i < huntsvilleLayers.length; i++){
                   var newfeatureLayer = new FeatureLayer({
                         url: huntsvilleLayers[i]
