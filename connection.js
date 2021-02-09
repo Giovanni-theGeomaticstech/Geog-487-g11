@@ -38,6 +38,8 @@ firebase.initializeApp(firebaseConfig);
 
 import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
+
+
 // We are going to use this function to firebase object keys
 // The function will return the Firebase Object key of a feature
 // Function assumes field in the database
@@ -121,13 +123,14 @@ export function deleteFeatureObject(user_type, type, featureID){
 // The update Existing Feature is used to update features that we have in the DB
 
 // Note A feature is passed directly from the front 
-export function updateExistingFeature(user_type, featureID, feature){
-  let type_feature = feature["geometry"]["type"]
+export function updateExistingFeature(user_type, featureID, feature, type_feature){
   let type = type_feature + "_ids"
   let featureIDsArrPromise = listFeatureIDs(user_type, type)
 
   return featureIDsArrPromise.then(function(featureIDsArr){
     // We check if the feature ID is the Feature ID list
+    console.log(featureID)
+    console.log(featureIDsArr)
     if (featureIDsArr.includes(featureID)){
       let objectIndex = featureIDsArr.indexOf(featureID)
       
@@ -144,7 +147,10 @@ export function updateExistingFeature(user_type, featureID, feature){
         console.log("Key ID Feature" + objectKeyFeature)
         updateFeature(user_type, feature, type_feature , objectKeyFeature) // We delete from DB
       })
+      console.log("Feature Updated")
+      return "Feature Updated"
     }
+    console.log("Feature Does not Exists")
     return "Feature Does not Exists"
 })
 }
@@ -181,8 +187,10 @@ export function listFeatures(user_type, type){
 // listFeatures("residence", "polygon")
 
 // The Return is a Promise of ID's
-export function listFeatureIDs(user_type, type=null){
+// The IDS are the FireBase Database IDS
+export function listFeatureIDs(user_type, type){
   let featureIDJson = loadfeatureIDs(user_type)
+  console.log(type)
   return featureIDJson[type].then(function(data){
     let listOfFeatureIDs = []
     for (let featureID in data){
@@ -200,7 +208,10 @@ export function listFeatureIDs(user_type, type=null){
 export function addNewFeature(user_type, feature, type){
   // Basically we want to call that Add Feature function in our connection .js
   console.log("add feature")
-  console.log(feature)
+  
+  // We can use to delete to remove an object property
+  // delete feature.popupTemplate
+
   if (feature){
     // Add in a functionality for a pop up of feature saved
     return addFeature(user_type, feature, type)

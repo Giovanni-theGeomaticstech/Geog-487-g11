@@ -35,7 +35,7 @@ export function addFeature(user_type, feature, type=null){
     featureInfo.set(feature);
 
     // As we add a feature we add its contents
-    addfeatureID(user_type, feature["ObjectID"], type)
+    addfeatureID(user_type, feature.attributes["ObjectID"], type)
     console.log("addFeatures")
 }
 
@@ -93,7 +93,9 @@ export function loadFeatures(user_type){
 export function updateFeature(user_type, feature, feature_type, objectKey){
     let db_location_feature = user_type + "/" + feature_type
     let ref = firebase.database().ref(db_location_feature)
+    console.log("Here info")
     console.log("updateFeature")
+    console.log(feature)
 
     /* GIO NOTES
     Gio: Add a last updated field

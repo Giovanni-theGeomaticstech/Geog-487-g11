@@ -8,6 +8,9 @@ Date Last Edited: January 29, 2021
 // The Point, Polygon, Polyline creation standards from the database
 // 
 
+import { uuid4 } from "../uuid4.js" // Unique IDs
+
+
 // The Schema for our feature layer
 const fields = [
     {
@@ -29,6 +32,11 @@ const fields = [
       name: "Data_added",
       alias: "date",
       type: "date"
+    },
+    {
+      name: "uuid",
+      alias: "uuid",
+      type: "string"
     },
     {
       name: "Description",
@@ -61,7 +69,10 @@ let popupTemplate_info = {
           fieldName: "ObjectID",
           label: "ID",
         },
-
+        {
+          fieldName: "uuid",
+          label: "UniqueIdentifier",
+        },
         ]
       }]
     
@@ -80,11 +91,16 @@ let popupTemplate_info = {
 let point_info =  {
     geometry: {
             type: "point",
-            x: -79.3832,
-            y: 43.6532
+            spatialReference:{
+              latestWkid: 3857,
+              wkid: 102100
+            },
+            x: -8818308.957272682,
+            y: 5672759.466050722
     },
     attributes: {
-            ObjectID: 100,
+            ObjectID: uuid4(),
+            uuid: uuid4(),
             Type: "point",
             Name: "TestPoint",
             Description: "Random Point",
@@ -120,6 +136,7 @@ let polyline_info = {
     attributes: {
         ObjectID: 1,
         Type: "line",
+        uuid:"value2",
         Name: "TestLine",
         Description: "Random Line",
         Data_added: Date.now()
@@ -158,6 +175,7 @@ let polygon_info = {
     attributes: {
         ObjectID: 130,
         Type: "line",
+        uuid:"value3",
         Name: "TestPolygon",
         Description: "Random Polygon",
         Data_added: Date.now()
@@ -166,5 +184,20 @@ let polygon_info = {
 };
 
 
+//https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
+// Gooing to use it on .applyEdits
+let addFeaturesData = {
+  addFeatures: []
+}
+
+let updateFeaturesData = {
+  updateFeatures: []
+}
+
+let deleteFeaturesData = {
+  deleteFeatures: []
+}
+
+
       
-export { fields, point_info, polyline_info, polygon_info, popupTemplate_info } // Making the fields variable accessible to other files
+export { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } // Making the fields variable accessible to other files

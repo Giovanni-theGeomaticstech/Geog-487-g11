@@ -4,9 +4,11 @@
 // The Code will focus anything map related to the ArcGIS API for JAVASCRIPT
 // This file will focus on the residences
 
-import { fields, point_info, polyline_info, polygon_info, popupTemplate_info } from "./basis.js" // Importing our fields schema
+import { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } from "./basis.js" // Importing our fields schema
 
-import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs} from "../connection.js" // importing our database tools
+import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../connection.js" // importing our database tools
+
+import { uuid4 } from "../uuid4.js" // Unique IDs
 
 
 require([
@@ -33,12 +35,13 @@ require([
     "esri/Graphic",
     "esri/layers/GraphicsLayer",
     "esri/layers/FeatureLayer",
-    
+
     // Widget for sketching
     "esri/widgets/Sketch",
 
     // Editor
-    "esri/widgets/Editor"
+    "esri/widgets/Editor",
+
   ], 
   /* NOW THE FUNCTION IS WHERE WE ADD THESE LIBRARIES*/
   /* I believe within in this function we will write all or JS code*/
@@ -120,6 +123,7 @@ require([
       
      // THE GRAPHICS CODE LAYER IS PROBABLY NO LONGER NEEDED
       let graphicslayer = new GraphicsLayer()
+      graphicslayer.id = "Core graphics"
       map.add(graphicslayer);
 
 
@@ -192,40 +196,43 @@ require([
       // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=layers-featurelayer-collection-edits
       // I can access shape properties now
       // console.log(feature_layer.source.items[0].geometry.type)
-        
+      
+
       // ADDING FEATURES TO THE POINTS FEATURE LAYER
       let feature_layer_points = new FeatureLayer({
-            source: [pointGraphic], // Collection of Graphics
+            source: [], // Collection of Graphics
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "point",
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
-      feature_layer_points.refreshInterval = 0.2; //Set the interval to 1 minute
-
+      feature_layer_points.refreshInterval = 1; //Set the interval to 1 minute
+      feature_layer_points.id = "feature_points"
       map.add(feature_layer_points);
       
       // ADDING FEATURES TO THE LINES FEATURE LAYER
       let feature_layer_lines = new FeatureLayer({
-            source: [polylineGraphic], // Collection of Graphics
+            source: [], // Collection of Graphics
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polyline",
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
+      feature_layer_lines.id = "feature_lines"
       map.add(feature_layer_lines);
 
       // ADDING FEATURES TO THE POLYGON FEATURE LAYER
       let feature_layer_polygons = new FeatureLayer({
-            source: [polygonGraphic], // Collection of Graphics
+            source: [], // Collection of Graphics
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polygon",
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
+      feature_layer_polygons.id = "feature_polygons"
       map.add(feature_layer_polygons);
       
 
@@ -242,11 +249,27 @@ require([
 
       
      //Editor widget
-     const editor = new Editor({
+
+//     let editConfigPoliceLayer = {
+//       layer: feature_layer_points,
+//       // Set it so that only one field displays within the form
+//       fieldConfig: [{
+//         name: "Name",
+//         label: "Name"
+//       }]
+//     };
+
+//      https://developers.arcgis.com/javascript/latest/sample-code/widgets-editor-configurable/
+// https://developers.arcgis.com/javascript/latest/api-reference/esri-widgets-Editor-CreateWorkflowData.html
+// Might have to create my own form
+// We have the createworkflow and updateworkflow
+
+      let editor = new Editor({
             view: view,
             allowedWorkflows: ["create","update"],
             container: document.getElementById("editWidget"), // Edit widget is defined in the index.html
             //layerInfos: if we do not want people to edit these layers specifically
+            // layerInfos: [editConfigPoliceLayer]
       });
      // Add widget to the view
 //      view.ui.add(editor, "top-right"); // We would use this if we wanted to have this directly on our map layer
@@ -260,16 +283,16 @@ require([
             // console.log(view.popup.features)
             console.log("here")
             // we can move this from here now
-            if (editor.activeWorkflow != null){
-                  console.log(editor.activeWorkflow.data.edits) // Do not pass this
-                  console.log(editor.activeWorkflow.data.edits.attributesModified)
-                  console.log(editor.activeWorkflow.data.edits.geometryModified)
-                  console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // NOW THIS WORKS [geometry, attributes, symbol, popupTemplate]
-                  console.log(editor.activeWorkflow.data.edits._baselineGeometryJSON)
-                  console.log(editor.activeWorkflow.data.edits._baselineAttributesJSON)
-                  console.log(editor.activeWorkflow.data.edits.updatingHandles)
-                  console.log(editor.activeWorkflow.data.edits.modified)
-            }           
+            // if (editor.activeWorkflow != null){
+            //       console.log(editor.activeWorkflow.data.edits) // Do not pass this
+            //       console.log(editor.activeWorkflow.data.edits.attributesModified)
+            //       console.log(editor.activeWorkflow.data.edits.geometryModified)
+            //       console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // NOW THIS WORKS [geometry, attributes, symbol, popupTemplate]
+            //       console.log(editor.activeWorkflow.data.edits._baselineGeometryJSON)
+            //       console.log(editor.activeWorkflow.data.edits._baselineAttributesJSON)
+            //       console.log(editor.activeWorkflow.data.edits.updatingHandles)
+            //       console.log(editor.activeWorkflow.data.edits.modified)
+            // }           
       })
 
       /////////////////////////////////////////////////////////////////
@@ -290,21 +313,70 @@ require([
             view.on("click", function(event){
                   view.hitTest(event).then(function(response){
                         if (response.results[0]){
+                              
                               clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
+                              response.results[0].graphic
                               console.log(clicked_feature_attr) // Gives me the currently clicked element
                         }    
                   })
             })
       })
 
+      // We use this to correct any added feature
+      // To check for the type of feature
+      function checkFeatureType(feature_info){
+            if (feature_info.geometry.rings){
+                  feature_info.attributes["Type"] = "polygon"
+                  feature_info.geometry["type"] = "polygon"
+            }
+            else if(feature_info.geometry.paths){
+                  feature_info.attributes["Type"] = "line"
+                  feature_info.geometry["type"] = "polyline"
+            }
+            else{
+                  feature_info.attributes["Type"] = "point"
+                  feature_info.geometry["type"] = "point"
+            }    
+            feature_info.popupTemplate = popupTemplate_info
+            return feature_info
+
+      }
+
+      //https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
+
+      function addClientFeatureLayer(type, featureJson){
+            // addFeaturesData, updateFeaturesData, deleteFeaturesData
+            let edits = addFeaturesData
+            let featureGraphic;
+
+            switch(type){
+                  case "point":
+                        featureJson.symbol = point_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.addFeatures.push(featureGraphic)
+                        console.log(edits)
+                        console.log(feature_layer_points.source.items)
+                        feature_layer_points.applyEdits(edits)
+                        console.log(feature_layer_points.source.items)
+                        break
+                  case "line" || "polyline":
+                        feature_layer_lines.applyEdits(edits)
+                        break
+                  case "polygon":
+                        feature_layer_polygons.applyEdits(edits)
+                        break
+
+            }
+      }
+      // addClientFeatureLayer("point", point_info)
 
       // Here we target the widget storing the add, update and delete feature
       let esri_widget = document.getElementById("editWidget")
       
       esri_widget.onclick = function(event){
             // We have to load features in here to make sure it fully loads
-            console.log(feature_layer_points.source.items) // Here we get the feature list
-            console.log(feature_layer_points.geometryType)
+            // console.log(feature_layer_points.source.items) // Here we get the feature list
+            // console.log(feature_layer_points.geometryType)
             //https://support.esri.com/en/technical-article/000013384
 
             let current_widget_item = event.target
@@ -312,45 +384,42 @@ require([
             let feature_info;
 
             let feature_id;
-            // Note this caused problems !!!
-            
+
             switch(current_widget_item.innerHTML){
                   case "Update":
                         info_update = "update"
                         feature_info = editor.activeWorkflow.data.edits.feature.toJSON()
-                        feature_id = clicked_feature_attr["ObjectID"];
-                        console.log(feature_info) // Leave this here for new info
-                        // updateFeatureLayer("residence", feature_id, null)
+                        // feature_id = clicked_feature_attr["ObjectID"];
+                        feature_id = feature_info.attributes["ObjectID"]
+                        feature_info = checkFeatureType(feature_info)
+                        console.log(feature_info)
+                        
+                        // updateExistingFeature("residence", feature_id, feature_info, feature_info.geometry["type"])
                         break
                   case "Add":
                         info_update = "add"
                         // console.log(feature_layer_points.source.items)
 
                         feature_info = editor.activeWorkflow.data.edits.feature.toJSON() 
-                        feature_info.attributes["ObjectID"] = 103;
-                        
-                        if (feature_info.geometry.rings){
-                              feature_info.attributes["Type"] = "polygon"
-                              feature_info.geometry["type"] = "polygon"
-                              // We have polygon
-                        }
-                        else if(feature_info.geometry.paths){
-                              feature_info.attributes["Type"] = "line"
-                              feature_info.geometry["type"] = "polyline"
-                        }
-                        else{
-                              feature_info.attributes["Type"] = "point"
-                              feature_info.geometry["type"] = "point"
-                        }
-                        console.log(feature_info)
-                        
-                        // Note need to make sure we update feature layer too
-                        // addFeatureLayer("residence",null, null)
-                        addNewFeature("residence", feature_info, feature_info.attributes["Type"])
-                        // Might be the hardest to do
-                        // Tricky gotta figure out where the layer is
+                        // console.log(feature_info.attributes["ObjectID"])
+                        feature_info.attributes["ObjectID"] = uuid4()
+                        feature_info.attributes["uuid"] = uuid4()
 
+                        /*****
+                        // So we have known glitch where we have two features that are added
+                        // Figure out how tof fix this
+
+                        The other option is to use the object ids.
+                        As we know the next new ones added would be of the last number that was added
+                        So keep track of this in the program
+                        ********************************************************* */
+
+                        feature_info = checkFeatureType(feature_info)
+                        // Note need to make sure we update feature layer too
+                        addClientFeatureLayer(feature_info.attributes["Type"], feature_info) // Note we have a duplicate features one from the editor features
+                        // addNewFeature("residence", feature_info, feature_info.attributes["Type"])
                         break
+
                   case "Delete":
                         info_update = "delete"
                         console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // So this does work
@@ -362,14 +431,7 @@ require([
 
       }
 
-      /// For Add feature we need a check to say the feature is not already in DB
-      // Update Feature we need the new feature and the type
-      // While delete feature we need the type of feature
-
-      function returnFeature(){
-            //pass
-      }
-      /////////////////////////////////////////////////////////////////
+     
 
       // Maybe I need this editing tool on the features
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#EditingInfo
