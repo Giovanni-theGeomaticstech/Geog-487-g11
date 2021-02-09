@@ -490,7 +490,7 @@ require([
                         addClientFeatureLayer(feature_info.attributes["Type"], feature_info) // Note we have a duplicate features one from the editor features
                         
                         // Adding to DB
-                        // addNewFeature("residence", feature_info, feature_info.attributes["Type"])
+                        addNewFeature("residence", feature_info, feature_info.attributes["Type"])
                         break
 
                   case "Delete":
