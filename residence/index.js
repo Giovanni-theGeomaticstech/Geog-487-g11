@@ -344,6 +344,8 @@ require([
 
       //https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
       // Adding features to the client side feature layers
+
+      
       function addClientFeatureLayer(type, featureJson){
             // addFeaturesData, updateFeaturesData, deleteFeaturesData
             let edits = addFeaturesData
@@ -373,6 +375,31 @@ require([
                         break
             }
       }
+
+      //////////////////////////////////////////////////////////////////////////////
+      /* Preloaded features from Database */ 
+      // Note listFeatures is a JavaScript promise object of all the Features in the database
+      // Thus we have to call a user type on it and the type of feature we want
+      
+      function loadDBFeatures(){
+            let listOfDBfeatures;
+            let featureTypes = ["point", "line", "polygon"]
+            
+            for (let i = 0; i < featureTypes.length; i++){
+                  listOfDBfeatures = listFeatures("residence", featureTypes[i])
+                  listOfDBfeatures.then(function(featureListJson){
+                        // Note we can also just pass in the array but we will have to do fixes
+                        for (let k = 0; k < featureListJson.length; k++){
+                              addClientFeatureLayer(featureTypes[i], featureListJson[k])
+                        }
+                        
+                  })
+            }     
+      }
+      loadDBFeatures()
+
+      //////////////////////////////////////////////////////////////////////////////
+
 
       // Adding features to the client side feature layers
 
