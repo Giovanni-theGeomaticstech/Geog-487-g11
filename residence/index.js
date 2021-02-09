@@ -354,15 +354,21 @@ require([
                         featureJson.symbol = point_info.symbol
                         featureGraphic = new Graphic(featureJson) 
                         edits.addFeatures.push(featureGraphic)
-                        // console.log(edits)
-                        // console.log(feature_layer_points.source.items)
+                     
                         feature_layer_points.applyEdits(edits)
-                        // console.log(feature_layer_points.source.items)
                         break
                   case "line" || "polyline":
+                        featureJson.symbol = polyline_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.addFeatures.push(featureGraphic)
+
                         feature_layer_lines.applyEdits(edits)
                         break
                   case "polygon":
+                        featureJson.symbol = polygon_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.addFeatures.push(featureGraphic)
+
                         feature_layer_polygons.applyEdits(edits)
                         break
             }
@@ -383,7 +389,6 @@ require([
                         edits.deleteFeatures.push(featureGraphic)
                         
                         feature_layer_points.applyEdits(edits)
-                        // console.log(feature_layer_points.source.items)
                         break
                   case "line" || "polyline":
                         featureJson.symbol = polyline_info.symbol
