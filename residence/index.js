@@ -281,7 +281,7 @@ require([
       view.popup.watch("visible", function(event){
             // console.log(view.popup)
             // console.log(view.popup.features)
-            console.log("here")
+            // console.log("here")
             // we can move this from here now
             // if (editor.activeWorkflow != null){
             //       console.log(editor.activeWorkflow.data.edits) // Do not pass this
@@ -315,8 +315,8 @@ require([
                         if (response.results[0]){
                               
                               clicked_feature_attr = response.results[0].graphic.attributes // Here we add the information, specifically the attributes
-                              response.results[0].graphic
-                              console.log(clicked_feature_attr) // Gives me the currently clicked element
+                              // response.results[0].graphic
+                              // console.log(clicked_feature_attr) // Gives me the currently clicked element
                         }    
                   })
             })
@@ -343,7 +343,7 @@ require([
       }
 
       //https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
-
+      // Adding features to the client side feature layers
       function addClientFeatureLayer(type, featureJson){
             // addFeaturesData, updateFeaturesData, deleteFeaturesData
             let edits = addFeaturesData
@@ -354,10 +354,10 @@ require([
                         featureJson.symbol = point_info.symbol
                         featureGraphic = new Graphic(featureJson) 
                         edits.addFeatures.push(featureGraphic)
-                        console.log(edits)
-                        console.log(feature_layer_points.source.items)
+                        // console.log(edits)
+                        // console.log(feature_layer_points.source.items)
                         feature_layer_points.applyEdits(edits)
-                        console.log(feature_layer_points.source.items)
+                        // console.log(feature_layer_points.source.items)
                         break
                   case "line" || "polyline":
                         feature_layer_lines.applyEdits(edits)
@@ -365,18 +365,41 @@ require([
                   case "polygon":
                         feature_layer_polygons.applyEdits(edits)
                         break
-
             }
       }
-      // addClientFeatureLayer("point", point_info)
 
+      // Adding features to the client side feature layers
+
+      function deleteClientFeatureLayer(type, featureJson){
+            // addFeaturesData, updateFeaturesData, deleteFeaturesData
+            let edits = deleteFeaturesData 
+            let featureGraphic;
+
+            switch(type){
+                  case "point":
+                        featureJson.symbol = point_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.deleteFeatures.push(featureGraphic)
+                        // console.log(edits)
+                        // console.log(feature_layer_points.source.items)
+                        feature_layer_points.applyEdits(edits)
+                        // console.log(feature_layer_points.source.items)
+                        break
+                  case "line" || "polyline":
+                        feature_layer_lines.applyEdits(edits)
+                        break
+                  case "polygon":
+                        feature_layer_polygons.applyEdits(edits)
+                        break
+            }
+      }
       // Here we target the widget storing the add, update and delete feature
+      // Now the work flow needs to be modified with the uuid as a comparison
       let esri_widget = document.getElementById("editWidget")
       
       esri_widget.onclick = function(event){
             // We have to load features in here to make sure it fully loads
             // console.log(feature_layer_points.source.items) // Here we get the feature list
-            // console.log(feature_layer_points.geometryType)
             //https://support.esri.com/en/technical-article/000013384
 
             let current_widget_item = event.target
@@ -390,11 +413,15 @@ require([
                         info_update = "update"
                         feature_info = editor.activeWorkflow.data.edits.feature.toJSON()
                         // feature_id = clicked_feature_attr["ObjectID"];
-                        feature_id = feature_info.attributes["ObjectID"]
+                        feature_id = feature_info.attributes["uuid"] // Use the uuid instead
+                        // Note that in the db both Object ID and UUID have the same values
+
                         feature_info = checkFeatureType(feature_info)
+                        console.log(info_update)
                         console.log(feature_info)
                         
-                        // updateExistingFeature("residence", feature_id, feature_info, feature_info.geometry["type"])
+                        // Updating DB
+                        updateExistingFeature("residence", feature_id, feature_info, feature_info.geometry["type"])
                         break
                   case "Add":
                         info_update = "add"
@@ -402,8 +429,9 @@ require([
 
                         feature_info = editor.activeWorkflow.data.edits.feature.toJSON() 
                         // console.log(feature_info.attributes["ObjectID"])
-                        feature_info.attributes["ObjectID"] = uuid4()
-                        feature_info.attributes["uuid"] = uuid4()
+                        let unique_id = uuid4()
+                        feature_info.attributes["ObjectID"] = unique_id
+                        feature_info.attributes["uuid"] = unique_id
 
                         /*****
                         // So we have known glitch where we have two features that are added
@@ -417,14 +445,32 @@ require([
                         feature_info = checkFeatureType(feature_info)
                         // Note need to make sure we update feature layer too
                         addClientFeatureLayer(feature_info.attributes["Type"], feature_info) // Note we have a duplicate features one from the editor features
+                        
+                        // Adding to DB
                         // addNewFeature("residence", feature_info, feature_info.attributes["Type"])
                         break
 
                   case "Delete":
                         info_update = "delete"
-                        console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // So this does work
-                        feature_id = clicked_feature_attr["ObjectID"];
-                        // deleteFeatureLayer("residence", null, feature_id)
+                        feature_info = editor.activeWorkflow.data.edits.feature.toJSON()
+
+                        feature_info = checkFeatureType(feature_info) // Protective measure for features
+
+                        // Dealing with the duplicate only touch db if their is a uuid
+                        // None Editor widget data
+
+                        if (feature_info.attributes){
+                              console.log("Getting UUID")
+                              feature_id = feature_info.attributes["uuid"] // Use the uuid instead
+                        }
+                        if (feature_id){ 
+                              console.log(feature_id)
+                              // Deleting from DB
+                              console.log(info_update)
+                              deleteClientFeatureLayer(feature_info.attributes["Type"], feature_info)
+                              deleteFeatureObject("residence", feature_info.attributes["Type"] + "_ids", feature_id)
+                        }
+                        
                         break
             }
             // console.log(feature_id)
