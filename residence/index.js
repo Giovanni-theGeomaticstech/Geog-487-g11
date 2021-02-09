@@ -371,6 +371,7 @@ require([
       // Adding features to the client side feature layers
 
       function deleteClientFeatureLayer(type, featureJson){
+            // Note the FeaturesData are JSON values
             // addFeaturesData, updateFeaturesData, deleteFeaturesData
             let edits = deleteFeaturesData 
             let featureGraphic;
@@ -380,15 +381,22 @@ require([
                         featureJson.symbol = point_info.symbol
                         featureGraphic = new Graphic(featureJson) 
                         edits.deleteFeatures.push(featureGraphic)
-                        // console.log(edits)
-                        // console.log(feature_layer_points.source.items)
+                        
                         feature_layer_points.applyEdits(edits)
                         // console.log(feature_layer_points.source.items)
                         break
                   case "line" || "polyline":
+                        featureJson.symbol = polyline_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.deleteFeatures.push(featureGraphic)
+
                         feature_layer_lines.applyEdits(edits)
                         break
                   case "polygon":
+                        featureJson.symbol = polygon_info.symbol
+                        featureGraphic = new Graphic(featureJson) 
+                        edits.deleteFeatures.push(featureGraphic)
+
                         feature_layer_polygons.applyEdits(edits)
                         break
             }
