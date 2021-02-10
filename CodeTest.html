@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>Renderer from Service</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+        integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+        integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+    
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.1.4/dist/esri-leaflet.js"
+        integrity="sha512-m+BZ3OSlzGdYLqUBZt3u6eA0sH+Txdmq7cqA1u8/B2aTXviGMMLOfrKyiIW7181jbzZAY0u+3jWoiL61iLcTKQ=="
+        crossorigin=""></script>
+
+    <style>
+      body { margin:0; padding:0; }
+      #map {position: absolute; top:0; bottom:0; right:0; left:0; }
+    </style>
+</head>
+<body>
+
+
+<div id="map"></div>
+
+<script>
+
+var map = L.map('map', {maxZoom: 20}).setView([ 41.78408507289525, -88.13716292381285], 18);
+
+L.esri.basemapLayer('Gray').addTo(map);
+
+var waterNetwork = L.esri.dynamicMapLayer(
+    'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Water_Network/MapServer', {
+    useCors: false
+}).addTo(map);
+
+waterNetwork.legend(function(error, legend){
+    if(!error) {
+        var html = '<ul>';
+        for(var i = 0, len = legend.layers.length; i < len; i++) {
+            html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+            for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+            }
+            html += '</ul></li>';
+        }
+        html+='</ul>';
+        document.getElementById('legend').innerHTML = html;
+    }
+});
+
+
+
+</script>
+</body>
+</html>
