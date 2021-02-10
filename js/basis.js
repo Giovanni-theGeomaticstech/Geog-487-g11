@@ -8,7 +8,7 @@ Date Last Edited: January 29, 2021
 // The Point, Polygon, Polyline creation standards from the database
 // 
 
-import { uuid4 } from "../uuid4.js" // Unique IDs
+// import { uuid4 } from "./uuid4.js" // Unique IDs
 
 
 // The Schema for our feature layer
@@ -99,8 +99,8 @@ let point_info =  {
             y: 5672759.466050722
     },
     attributes: {
-            ObjectID: uuid4(),
-            uuid: uuid4(),
+            ObjectID: 1,//uuid4(),
+            uuid: "something", //uuid4(),
             Type: "point",
             Name: "TestPoint",
             Description: "Random Point",

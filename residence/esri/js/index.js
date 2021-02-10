@@ -4,11 +4,11 @@
 // The Code will focus anything map related to the ArcGIS API for JAVASCRIPT
 // This file will focus on the residences
 
-import { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } from "./basis.js" // Importing our fields schema
+import { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } from "../../../js/basis.js" // Importing our fields schema
 
-import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../connection.js" // importing our database tools
+import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
 
-import { uuid4 } from "../uuid4.js" // Unique IDs
+import { uuid4 } from "../../../js/uuid4.js" // Unique IDs
 
 
 require([
@@ -42,6 +42,9 @@ require([
     // Editor
     "esri/widgets/Editor",
 
+    // Layerslists
+    "esri/widgets/LayerList", 
+
     //NodeJs
 //     "dojo/node!dotenv"
 
@@ -49,7 +52,7 @@ require([
   /* NOW THE FUNCTION IS WHERE WE ADD THESE LIBRARIES*/
   /* I believe within in this function we will write all or JS code*/
   function(Map, MapView, BasemapToggle,BasemapGallery, Track, Locate, Search, PopupTemplate, 
-      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, ) { //dotenv
+      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, LayerList,) { //dotenv
 
         /////////////////////////////////////////////////////////////
         // SETTING UP OUR MAP LAYER
@@ -584,5 +587,14 @@ require([
       //https://developers.arcgis.com/javascript/latest/api-reference/esri-views-layers-support-FeatureFilter.html
  
       
+
+
+      // Adding the Layers List
+      var layerList = new LayerList({
+            view: view
+          });
+      // Add widget to the top right corner of the view
+      view.ui.add(layerList, "top-right");
+
   }
 );
