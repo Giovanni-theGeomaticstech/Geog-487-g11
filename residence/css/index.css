@@ -37,7 +37,7 @@ html, body{
     position: relative;
     /* float:right; */
     height: 70%;
-    width: 48%;
+    width: 49%;
     /* border: 1px solid red; */
   }
   #viewDiv {
@@ -53,10 +53,18 @@ html, body{
     width: 25%;
   }
 
+  /* Get elements to be in the same block */
   .aligned{
     display:inline-block;
     padding: 2px;
   }
+
+  /* Turn Layers on and off */
+  #toggle_layers{
+    height: 70%;
+    width: 25%;
+  }
+
 
   /*************************************************************/
 

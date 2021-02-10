@@ -8,3 +8,7 @@
 - `git fetch origin`
 - `git checkout remote_branch_name`
 
+## 
+- `git branch --set-upstream-to=origin/development`
+- Set up stream to track a certain branch
+- Lets say we hace a branch not connected

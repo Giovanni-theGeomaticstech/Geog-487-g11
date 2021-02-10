@@ -45,6 +45,12 @@ require([
     // Layerslists
     "esri/widgets/LayerList", 
 
+    // Tables
+    "esri/widgets/FeatureTable",
+    // Table Lists
+    "esri/widgets/TableList",
+
+
     //NodeJs
 //     "dojo/node!dotenv"
 
@@ -52,7 +58,7 @@ require([
   /* NOW THE FUNCTION IS WHERE WE ADD THESE LIBRARIES*/
   /* I believe within in this function we will write all or JS code*/
   function(Map, MapView, BasemapToggle,BasemapGallery, Track, Locate, Search, PopupTemplate, 
-      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, LayerList,) { //dotenv
+      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, LayerList, FeatureTable, TableList) { //dotenv
 
         /////////////////////////////////////////////////////////////
         // SETTING UP OUR MAP LAYER
@@ -128,9 +134,9 @@ require([
      //https://developers.arcgis.com/javascript/latest/add-a-point-line-and-polygon/
       
      // THE GRAPHICS CODE LAYER IS PROBABLY NO LONGER NEEDED
-      let graphicslayer = new GraphicsLayer()
-      graphicslayer.id = "Core graphics"
-      map.add(graphicslayer);
+      // let graphicslayer = new GraphicsLayer()
+      // graphicslayer.id = "Core graphics"
+      // map.add(graphicslayer);
 
 
       // Note we take our graphic from Point Info
@@ -170,30 +176,31 @@ require([
       // });
 
 
+      ////////////////////////////////////////////////////////////////////////
+      // Using the Sketch widget
+      // const sketch = new Sketch({
+      //     layer: graphicslayer,
+      //     view: view,
+      //     // graphic will be selected as soon as it is created
+      //     creationMode: "update"
+      //   });
 
-      const sketch = new Sketch({
-          layer: graphicslayer,
-          view: view,
-          // graphic will be selected as soon as it is created
-          creationMode: "update"
-        });
+      // view.ui.add(sketch, "bottom-left");
 
-      view.ui.add(sketch, "bottom-left");
-
-      // We can either use this as the editor tag
-      sketch.on("create", function(event) {
-            // check if the create event's state has changed to complete indicating
-            // the graphic create operation is completed.
-            if (event.state === "complete") {
-              // remove the graphic from the layer. Sketch adds
-              // the completed graphic to the layer by default.
-            //   graphicslayer.remove(event.graphic);
-                  console.log(event.graphic.geometry.type)
+      // // We can either use this as the editor tag
+      // sketch.on("create", function(event) {
+      //       // check if the create event's state has changed to complete indicating
+      //       // the graphic create operation is completed.
+      //       if (event.state === "complete") {
+      //         // remove the graphic from the layer. Sketch adds
+      //         // the completed graphic to the layer by default.
+      //       //   graphicslayer.remove(event.graphic);
+      //             console.log(event.graphic.geometry.type)
           
-              // use the graphic.geometry to query features that intersect it
-            //   selectFeatures(event.graphic.geometry);
-            }
-      })
+      //         // use the graphic.geometry to query features that intersect it
+      //       //   selectFeatures(event.graphic.geometry);
+      //       }
+      // })
 
       ///////////////////////////////////////////////////////////////////
       // Feature Layer
@@ -284,7 +291,7 @@ require([
       // We look on Methods
       
 //      console.log(editor.hasEventListener("create"))
-      view.popup.watch("visible", function(event){
+      // view.popup.watch("visible", function(event){
             // console.log(view.popup)
             // console.log(view.popup.features)
             // console.log("here")
@@ -299,7 +306,7 @@ require([
             //       console.log(editor.activeWorkflow.data.edits.updatingHandles)
             //       console.log(editor.activeWorkflow.data.edits.modified)
             // }           
-      })
+      // })
 
       /////////////////////////////////////////////////////////////////
 
@@ -525,6 +532,29 @@ require([
 
      
 
+      
+      // Implement Table List feature
+      function createFeatureTable(feature_layer){
+            //https://developers.arcgis.com/javascript/latest/api-reference/esri-widgets-FeatureTable.html
+            // https://developers.arcgis.com/javascript/latest/sample-code/widgets-tablelist/
+            // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=widgets-tablelist
+            // third example is real good
+            let featureTable = new FeatureTable({
+                  view:view,
+                  layer:feature_layer,
+                  container: document.getElementById("tableInfo")
+            })
+            // const tableList = new TableList({
+            //       // Two tables should display, the first one is stored within the webmap,
+            //       //ie. Chicago public health statistics. The other is dynamically loaded
+            //       //from the portal item, ie. Chicago Covid daily cases deaths and hospitalizations.
+            //       map: webmap, // get access to the map which has the collection of tables
+            //       selectionEnabled: true,
+            //       listItemCreatedFunction: createActions,
+            //       container: document.createElement("div")
+            //     });
+      }
+
       // Maybe I need this editing tool on the features
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#EditingInfo
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#applyEdits
@@ -537,17 +567,22 @@ require([
        * The function loadOnlineFeatLayers adds the ArcGIS online Feature layers
        * Load in predefined layers
        ********************/
-      
 
       function loadOnlineFeatLayers(){
             // Huntsville Boundary item 1
             let huntsvilleLayers = [
-                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
-                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Boundary/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Rivers_line_huntsville/FeatureServer",
                   "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
                   "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
-                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
-                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons_huntsville/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Points_huntsville/FeatureServer"
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
             ]
 
             for (let i = 0; i < huntsvilleLayers.length; i++){
@@ -555,9 +590,13 @@ require([
                         url: huntsvilleLayers[i]
                   });
                   map.add(newfeatureLayer)
+                  // Test it out
+                  if (i == huntsvilleLayers.length - 1){
+                        createFeatureTable(newfeatureLayer)
+                  }
             }    
       }
-      // loadOnlineFeatLayers()
+      loadOnlineFeatLayers()
       
       /********************
        * Add feature layer From Gabby
@@ -590,11 +629,13 @@ require([
 
 
       // Adding the Layers List
+      // Untitled layers are the feature layers I created
       var layerList = new LayerList({
-            view: view
+            view: view,
+            container: document.getElementById("toggle_layers"), // Edit widget is defined in the index.html
           });
       // Add widget to the top right corner of the view
-      view.ui.add(layerList, "top-right");
+      // view.ui.add(layerList, "top-right");
 
   }
 );

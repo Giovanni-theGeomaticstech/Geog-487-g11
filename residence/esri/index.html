@@ -66,7 +66,10 @@
         <!-- Adding our map to the page-->
         <div id = "maparea" class="aligned"><div id="viewDiv"></div></div>
         
-        <!-- Search Bar -->
+        <!-- Toggle Layers on and off-->
+        <div id ="toggle_layers" class="aligned">
+            <h1>Layers List</h1>
+        </div>
         
         
     </div>
@@ -84,14 +87,15 @@
 
     <!--The tab Containers check tabination.css-->
     <div class = "toggle_container">
-        <button class="tablink" onclick="openPage('Home', this, 'red')">Data Table</button>
+        <button class="tablink" onclick="openPage('Table', this, 'red')">Data Table</button>
         <button class="tablink" onclick="openPage('News', this, 'green')" id="defaultOpen">Flood Locator</button>
         <button class="tablink" onclick="openPage('Contact', this, 'blue')">Not Available</button>
         <button class="tablink" onclick="openPage('About', this, 'orange')">Not Available</button>
 
-        <div id="Home" class="tabcontent">
-        <h3>Home</h3>
-        <p>Home is where the heart is..</p>
+        <div id="Table" class="tabcontent">
+        <h3>Table</h3>
+        <div id = "tableInfo" style="height: 400px"></div>
+        <!-- <p></p> -->
         </div>
 
         <div id="News" class="tabcontent">
