@@ -354,8 +354,16 @@ function loadOnlineFeatLayers(){
 	let featureLayers = {} // Our Layers
 	for (let i = 0; i < huntsvilleLayers.length; i++){
 		  var newfeatureLayer = L.esri.featureLayer({
-				url: huntsvilleLayers[i]
+				url: huntsvilleLayers[i],
+				// fields: // We get an array of fields
 		  });
+		  newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
+			  let layer = feature.layer
+			  let layerJson = layer.toGeoJSON()
+			  let area = turf.area(layerJson) // We can directly pass geojson to turf.js
+			  // http://turfjs.org/docs/#shortestPath
+			  console.log(area)
+		  })
 		  featureLayers[nameLayers[i]] = newfeatureLayer
 	}    
 	// Creates layer list and adds feature layers to map
@@ -375,6 +383,7 @@ function loadOnlineFeatLayers(){
 	controlPanel.addTo(map)
 }
 loadOnlineFeatLayers()
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
