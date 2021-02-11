@@ -1,3 +1,9 @@
+import { uuid4 } from "../js/uuid4.js"
+import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../js/connection.js" // importing our database tools
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 // Adding in Map to application
 var map = L.map('map', {
 	editable: true,
@@ -5,46 +11,18 @@ var map = L.map('map', {
   }).setView([45.32424, -79.210724], 15);
 
   let layer = L.esri.basemapLayer('Topographic').addTo(map);
+///////////////////////////////////////////////////////////////////////////////////////////////
 
- ///////////////////////////////////////////////////////////////////////////////////////////////
-// Switch Between Base Maps
-// Removed this Option
-// As it gave multiple Basemaps
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Adding Locator
 
-// var layerLabels;
+// https://esri.github.io/esri-leaflet/api-reference/
+// https://docs.mapbox.com/mapbox.js/example/v1.0.0/leaflet-locatecontrol/
+// Note to self we can also integrate differenct cdns for leaflet from mapbox for example
+L.control.locate().addTo(map);
 
-// function setBasemap (basemap) {
-// 	if (layer) {
-// 	map.removeLayer(layer);
-// 	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 	layer = L.esri.basemapLayer(basemap);
-
-// 	map.addLayer(layer);
-
-// 	if (layerLabels) {
-// 	map.removeLayer(layerLabels);
-// 	}
-
-// 	if (
-// 	basemap === 'ShadedRelief' ||
-// 	basemap === 'Oceans' ||
-// 	basemap === 'Gray' ||
-// 	basemap === 'DarkGray' ||
-// 	basemap === 'Terrain'
-// 	) {
-// 		layerLabels = L.esri.basemapLayer(basemap + 'Labels');
-// 		map.addLayer(layerLabels);
-// 	} else if (basemap.includes('Imagery')) {
-// 		layerLabels = L.esri.basemapLayer('ImageryLabels');
-// 		map.addLayer(layerLabels);
-// 	}
-// }
-
-// document.querySelector('#basemaps').addEventListener('change', function (e) {
-// 	var basemap = e.target.value;
-// 	setBasemap(basemap);
-// });
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,21 +44,8 @@ L.esri.Geocoding.geosearch({
 
 
 ///////////////////////////////////////////////////////////////////////////
+// Making the Point Marker symbol
 
-// var map = L.map('map', {
-// 	editable: true,
-// 	doubleClickZoom: false
-// })
-  // mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-	
-// L.tileLayer(
-// 	'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-// 	attribution: '&copy; ' + mapLink + ' Contributors',
-// 	maxZoom: 18,
-// 	}).addTo(map);
-
-// LICON is styling for the Marker symbols/points
-//https://leafletjs.com/examples/custom-icons/
 var LeafIcon = L.Icon.extend({
 	options: {
 		shadowUrl: 
@@ -102,9 +67,16 @@ var greenIcon = new LeafIcon({
 // https://docs.eegeo.com/eegeo.js/v0.1.730/docs/leaflet/L.FeatureGroup/
 // https://www.tutorialspoint.com/leafletjs/leafletjs_layers_group.htm
 
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Adding the drawing info for the features 
+
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
-
 var drawControl = new L.Control.Draw({
 	position: 'bottomleft',
 	draw: {
@@ -146,39 +118,187 @@ var drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// This portion Adds the layer that we draw to (layer) to the map
+///////////////////////////////////////////////////////////////////////////////////
+// The metadata feature information
+// The Javascript for allowing our form to automatically open when we draw to map
+let formOpen = document.getElementById("myForm")
+
+function metaInfoPopup(){
+	formOpen.style.display = "block";
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+
+// The Add information Button
+let addInfoBtn = document.getElementById("addBtn") // When we submit the info
+let closeBtn = document.getElementById("closeBtn")
+
+// This variable stores the metadata
+let addAttributeData;
+
+
+
+// Formats the data to be used for the meta information
+function metaFormatHtml(attributes){
+	// Going to use template literals
+	// Simple string substitution
+
+	let header = `<h3>${attributes["Name"]}</h3></br>`
+	let date_added = ""
+	if (attributes["Date_added"]){
+		date_added = `<b>Date Last Updated:</b> <p>${attributes["Date_added"]}</p></br>`
+	}
+	let description = `<b>Description:</b> <p>${attributes["Description"]}</p></br>`
+
+	let type = `<b>Type:</b> <p>${attributes["Type"]}</p></br></br>`
+
+	return header + type + date_added + description
+}
+///////////////////////////////////////////////////////////////////
+
+function addBtnFunc(layer){
+	let unique_id;
+
+	let name = document.getElementById("input_name")
+	let type = document.getElementById("input_type")
+	let date_added = document.getElementById("input_date")
+	let description = document.getElementById("input_description")
+
+	if (layer.attributes){
+		unique_id = layer.attributes["uuid"]
+		// name.value = layer.attributes["Name"]
+		// type.value = layer.attributes["Type"]
+		// date_added.value = layer.attributes["Data_added"]
+		// description.value = layer.attributes["Description"]
+	}
+	else{
+		unique_id = uuid4()
+	}
+	// console.log(layer.layerType)
+	
+
+    addAttributeData = {
+        "Name": name.value,
+        "Type": type.value,//layer.layerType,
+        "uuid": unique_id, // Probably automatically crea
+        "ObjectID": unique_id ,
+        "Data_added": date_added.value,
+        "Description": description.value,
+    }
+    // console.log(addAttributeData)
+
+	layer.attributes = addAttributeData // We add the corresponding meta data
+	let popup = metaFormatHtml(addAttributeData)
+	
+
+	// Add the popup to the layer
+	layer.bindPopup(popup)
+
+	// Close the form
+	formOpen.style.display = "none";
+	name.value = ""
+	type.value = ""
+	date_added.value = ""
+	description.value = ""
+
+	// Clear out the form information
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Feature Group.on click event
+// https://stackoverflow.com/questions/30849283/how-to-get-id-of-layer-in-feature-group-on-click
+// http://plnkr.co/edit/4fh7vhVet8N0iD4GE3aN?preview
+// group.eachLayer(function(layer) {
+// 	layer.on('click', function(){
+// 	 alert(this._leaflet_id);
+// 	});
+//   });
+
+map.on("mouseover", function(){
+	// console.log("here")
+	drawnItems.eachLayer(function(layer){
+		layer.on('mouseover', function(feature){
+			metaInfoPopup()
+			// Here we add the add button functionality to take the layer info
+			addInfoBtn.onclick = function(){
+				addBtnFunc(layer)
+			}
+			console.log(layer.attributes)
+			console.log(layer.toGeoJSON())
+			console.log(layer.layerType)
+			// return
+			// if(addAttributeData){
+			// 	layer.bindPopup("Hello")
+			// }
+
+		})
+	})
+})
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// On Map Draw completed
+// ADDING FEATURE TO THE MAP AND THE DATABASE
 
 map.on('draw:created', function (feature) {
 	let type = feature.layerType, layer = feature.layer;
-	alert(type)
-	// alert("<input type='text'>")
+	// Here we create the UUID and Object ID
+	let unique_id = uuid4()
 
-	if (type === 'marker') {
-		// We can manipulate the information based on html tags
-		// We need to think of the meta data aspect ???
-		layer.bindPopup('<h1>Head Information</h1> + <p>Wah gwaan</p?');
-	}
+
+	let layerJson = layer.toGeoJSON() // Convert our Feature to GeoJSON
+	// Note Properties is Native to Leaflet
 	
-	console.log(layer)
+	// We are going to add the attributes to keep consistency with ESRI
+	let attributesInfo = {
+		"uuid": unique_id,
+		"ObjectID": unique_id,
+		"Type": layerJson.geometry["type"].toLowerCase()
+	}
+
+	// We add the attributes to both the actual Layers and the Feature
+
+	layer.attributes = attributesInfo
+	layerJson.attributes = attributesInfo
+
+
+	// ADDING Layer to the DB
+	addNewFeature("residence", layerJson, layerJson.attributes["Type"])
+	
+	//ADDING Layer TO THE MAP
 	drawnItems.addLayer(layer);
 });
+///////////////////////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// On Map Draw edit
 // https://gis.stackexchange.com/questions/259250/how-to-detect-delete-or-edit-events-in-popup-menu-created-with-leaflet-draw
-
 // For edit event
 // Better for the two events is to get the clicked features
+
 map.on('draw:edited', function (evt) {
 	layer = evt.layer;
 	console.log(layer)
 	// do something when polygon is edited
 });
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-// For deleted event
+///////////////////////////////////////////////////////////////////////////////////////////////
+// On Map Draw deleted
 map.on('draw:deleted', function(feature){
 	alert(feature.layerType)
 })
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 // To access the coords for points
 // layer.editing._maker._latlng
@@ -197,23 +317,8 @@ map.on('draw:deleted', function(feature){
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Creating the Leaflet Layer List
-
-// Adding in our layers
-
-// Define Huntsville Feature Layers
-
+// Creating and Adding the Leaflet Layer List
 function loadOnlineFeatLayers(){
-
-	// Huntsville Boundary item 1
-	// var CensusSubdivisions = L.esri.featureLayer({ 
-	// 	url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer/0"})
-	// var HunstvilleTransitBusStops = L.esri.featureLayer({url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer/0"})
-	// var HuntsvilleTransitBusRoutes = L.esri.featureLayer({ url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer/0"})
-	// var LakesAndRivers = L.esri.featureLayer({url:"https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer/0"})
-	// var RiversLines = L.esri.featureLayer({url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer/0"})
-	// var Emergency_Management_HistoricalEvent = L.esri.featureLayer({url: "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer/0"})
-	
 	let huntsvilleLayers = [
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Boundary/FeatureServer/0",
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Rivers_line_huntsville/FeatureServer/0",
@@ -221,12 +326,6 @@ function loadOnlineFeatLayers(){
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer/0",
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons_huntsville/FeatureServer/0",
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Points_huntsville/FeatureServer/0"
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
-		  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
 	]
 
 	let nameLayers = ["Huntsville Boundary", "Rivers", "Bus Stops", "Bus Routes", "Lakes and Rivers", "Historical Emergency Management Events"]
@@ -255,21 +354,6 @@ function loadOnlineFeatLayers(){
 }
 loadOnlineFeatLayers()
 
-// var OverlayMaps = {
-//     "Census Subdivisions": CensusSubdivisions,
-//     "Bus Stops": HunstvilleTransitBusStops,
-//     "Bus Routes": HuntsvilleTransitBusRoutes,
-//     "Lakes and Rivers": LakesAndRivers,
-//     "River Outlines": RiversLines,
-//     "Emergency Management Historical Events": Emergency_Management_HistoricalEvent,    
-// };
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Adding Locator
-// https://esri.github.io/esri-leaflet/api-reference/
-// https://docs.mapbox.com/mapbox.js/example/v1.0.0/leaflet-locatecontrol/
-// Note to self we can also integrate differenct cdns for leaflet from mapbox for example
-L.control.locate().addTo(map);
 
 
 // https://www.w3schools.com/js/js_timing.asp

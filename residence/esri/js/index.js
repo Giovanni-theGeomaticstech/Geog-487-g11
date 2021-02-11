@@ -450,6 +450,8 @@ require([
       // Now the work flow needs to be modified with the uuid as a comparison
       let esri_widget = document.getElementById("editWidget")
       
+      // Developed this to work with the Editor Widget
+      
       esri_widget.onclick = function(event){
             // We have to load features in here to make sure it fully loads
             // console.log(feature_layer_points.source.items) // Here we get the feature list

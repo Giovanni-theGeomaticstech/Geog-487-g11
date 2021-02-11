@@ -7,7 +7,15 @@ body {
   padding:0; 
 }
 
-#map { position: absolute; top:0; bottom:0; right:0; left:0; }
+#map { 
+  position: absolute; 
+  top:0; 
+  bottom:0; 
+  right:0; 
+  left:0; 
+  height: 60%;
+  width: 60%;
+}
     
 #basemaps-wrapper {
   position: absolute;

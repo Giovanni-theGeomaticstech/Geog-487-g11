@@ -30,9 +30,15 @@
  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css"
  integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
  crossorigin="">
+
+ <!--Popup Form css Files-->
+ <link rel = "stylesheet" href = "../css/popup_form.css"/>
+
+
 <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
  integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
  crossorigin=""></script>
+
 
  <!--Allowing Element drag leaflet-->
  <script src="https://unpkg.com/leaflet.path.drag@0.0.6/src/Path.Drag.js"></script>
@@ -48,6 +54,11 @@
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.ie.css' rel='stylesheet' />
 <![endif]-->
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />
+
+<!--Database Content-->
+<script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-database.js"></script>
+
 </head>
 <body>
 
@@ -72,7 +83,44 @@
   </div> -->
 
 
-<script src ="index.js"></script>
+  <!-- Adding the Popup Feature-->
+
+  <!-- <button id="openBtn" class="open-button">Open Form</button> -->
+  <div class="form-popup" id="myForm">
+    <div class="form-container">
+      <h1>Login</h1>
+  
+      <!-- <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Enter Email" name="email" required>
+  
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required> -->
+  
+      <label for="input_name"><b>Name</b></label>
+      <input id="input_name" type="text" placeholder="The feature name" name="input_name" required>
+  
+      <label for="input_type"><b>Type</b></label>
+      <input id="input_type" type="text" placeholder="Feature type" name="input_type">
+  
+  
+      <label for="input_date"><b>Date</b></label>
+      <input id="input_date" type="date" placeholder="Current date" name="input_date" required>
+  
+      <label for="input_uuid"><b>UUID</b></label>
+      <input id="input_uuid" type="text" placeholder="" name="input_uuid" required>
+  
+      <label for="input_description"><b>Description</b></label>
+      <input id="input_description" type="text" placeholder="Contribution Description..." name="input_description" required>
+  
+      <button id="addBtn" class="btn cancel">Update Information</button>
+      <!-- <button type="button" id ="closeBtn" class="btn cancel">Close</button> -->
+    </div>
+  </div>
+
+
+<script type="module" src ="index.js"></script>
+<script type="module" src="../js/popup_form.js"></script>
+
 </body>
     
 </html>
