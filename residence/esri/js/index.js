@@ -403,7 +403,19 @@ require([
                   listOfDBfeatures.then(function(featureListJson){
                         // Note we can also just pass in the array but we will have to do fixes
                         for (let k = 0; k < featureListJson.length; k++){
-                              addClientFeatureLayer(featureTypes[i], featureListJson[k])
+                              let layerJson = featureListJson[k]
+                              
+                              // The GeoJSON in Leaflet to Feature For ArcGIS Api
+                              // delete layerJson["type"]
+                              // if (layerJson.attributes["Type"].toLowerCase() == "linestring"){
+                              //       layerJson.attributes["Type"] = "line"
+                              //       layerJson.geometry["type"] = "polyline" 
+                              // }
+                              if (layerJson["type"]){ // temporary
+                                    continue
+                              }
+                              addClientFeatureLayer(featureTypes[i], layerJson)
+                              
                         }
                         
                   })
@@ -478,7 +490,7 @@ require([
                         // Updating DB
                         updateExistingFeature("residence", feature_id, feature_info, feature_info.geometry["type"])
                         break
-                        
+
                   case "Add":
                         info_update = "add"
                         // console.log(feature_layer_points.source.items)

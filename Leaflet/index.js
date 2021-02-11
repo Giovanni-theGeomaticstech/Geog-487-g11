@@ -257,12 +257,17 @@ map.on('draw:created', function (feature) {
 
 	let layerJson = layer.toGeoJSON() // Convert our Feature to GeoJSON
 	// Note Properties is Native to Leaflet
+
 	
 	// We are going to add the attributes to keep consistency with ESRI
+	let mod_type = layerJson.geometry["type"].toLowerCase();
+	if (layerJson.geometry["type"].toLowerCase() == "linestring"){
+		mod_type = "line"
+	}
 	let attributesInfo = {
 		"uuid": unique_id,
 		"ObjectID": unique_id,
-		"Type": layerJson.geometry["type"].toLowerCase()
+		"Type": mod_type//layerJson.geometry["type"].toLowerCase()
 	}
 
 	// We add the attributes to both the actual Layers and the Feature
@@ -324,14 +329,7 @@ map.on('draw:deleted', function(){
 })
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// To access the coords for points
-// layer.editing._maker._latlng
 
-// For polygon
-// layer.editing.latlngs
-
-// For Lines
-// layer.editing.latlngs
 
 // Esri leaflet feature
 // http://esri.github.io/esri-leaflet/api-reference/layers/feature-layer.html
@@ -378,6 +376,67 @@ function loadOnlineFeatLayers(){
 }
 loadOnlineFeatLayers()
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+/* Preloaded features from Database */ 
+// Note listFeatures is a JavaScript promise object of all the Features in the database
+// Thus we have to call a user type on it and the type of feature we want
+
+
+// Adding features to the client side feature layers
+
+      
+// function addClientFeatureLayer(type, featureJson){
+
+
+// 	switch(type){
+// 		  case "point":
+// 				featureJson.symbol = point_info.symbol
+// 				break
+// 		  case "line" || "polyline":
+// 				featureJson.symbol = polyline_info.symbol
+// 				break
+// 		  case "polygon":
+// 				featureJson.symbol = polygon_info.symbol
+// 				break
+// 	}
+// }
+
+
+function loadDBFeatures(){
+	let listOfDBfeatures;
+	let featureTypes = ["point", "line", "polygon"]
+
+	for (let i = 0; i < featureTypes.length; i++){
+			listOfDBfeatures = listFeatures("residence", featureTypes[i])
+			listOfDBfeatures.then(function(featureListJson){
+
+				// Note we can also just pass in the array but we will have to do fixes
+				for (let k = 0; k < featureListJson.length; k++){
+					let layerJson = featureListJson[k]
+					// Feature For ArcGIS Api to The GeoJSON in Leaflet
+					// console.log(layerJson)
+					// layerJson["type"] = "Feature"
+
+					// if (layerJson.attributes["Type"] == "line"){
+					// 	layerJson.geometry["type"] = "LineString"
+					// }
+					if (layerJson["type"] == "Feature"){ // temporary for now
+						L.geoJSON(layerJson).addTo(map)
+					}
+					
+						// addClientFeatureLayer(featureTypes[i], featureListJson[k])
+				}
+				// L.geoJSON(featureListJson).addTo(map); // Adding all the features to the map
+				
+			})
+	}     
+  }
+  loadDBFeatures()
+
+///////////////////////////////////////////////////////////////////////////////
 
 
 // https://www.w3schools.com/js/js_timing.asp
