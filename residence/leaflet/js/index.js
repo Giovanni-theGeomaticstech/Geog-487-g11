@@ -438,6 +438,27 @@ function loadDBFeatures(){
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/********************
+       * Load in layers from user input
+       ********************/
+
+      let search_btn = document.getElementById("search_btn_url")
+      search_btn.onclick = function(){
+            
+            let url = document.getElementById("url_info").value + "/0"
+            // Need to check for mapservice stuff
+            // Sample Url
+            //https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer
+            if (url && url.includes("https://services1.arcgis.com/") && url.includes("FeatureServer")){
+                  var newfeatureLayer = L.esri.featureLayer({
+					url: url
+			  	});
+				newfeatureLayer.addTo(map)
+				alert("Layer was successfully added")
+            }  else{
+                  alert("Layer with url:" + url + " does not exists!")
+            }
+      }
 // Fetch file info
 
 
