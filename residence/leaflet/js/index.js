@@ -1,5 +1,5 @@
-import { uuid4 } from "../js/uuid4.js"
-import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../js/connection.js" // importing our database tools
+import { uuid4 } from "../../../js/uuid4.js"
+import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -437,6 +437,10 @@ function loadDBFeatures(){
   loadDBFeatures()
 
 ///////////////////////////////////////////////////////////////////////////////
+
+// Fetch file info
+
+
 
 
 // https://www.w3schools.com/js/js_timing.asp

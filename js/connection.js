@@ -32,15 +32,17 @@
 
 // Note this File is the connection path for the DB
 
+
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDEbPCl-DqP0Au6z0ojUqCyP3bD9JitAdY",
-  authDomain: "sample-c4b1e.firebaseapp.com",
-  databaseURL: "https://sample-c4b1e.firebaseio.com",
-  projectId: "sample-c4b1e",
-  storageBucket: "sample-c4b1e.appspot.com",
-  messagingSenderId: "86495474066",
-  appId: "1:86495474066:web:79594a6a19a33ec44ed14b",
-  measurementId: "G-MDNH01Q427"
+  apiKey: "AIzaSyASl3akZm0lj3Rh_hLhMydxhOs52NONH7E",
+  authDomain: "huntsville-proj.firebaseapp.com",
+  databaseURL: "https://huntsville-proj-default-rtdb.firebaseio.com",
+  projectId: "huntsville-proj",
+  storageBucket: "huntsville-proj.appspot.com",
+  messagingSenderId: "332679935283",
+  appId: "1:332679935283:web:a7ba6b4deea0c97f317a46",
+  measurementId: "G-S6VBDD8DQ4"
 };
 
 

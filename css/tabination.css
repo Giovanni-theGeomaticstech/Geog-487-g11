@@ -4,10 +4,10 @@
   /* Style tab links */
  
   .toggle_container{ /* Change the container height*/
-      height: 30% !important;
+      height: 30%;
       border: 1px solid black;
       position: relative;
-      top: -30% !important;
+      top: -30%;
   }
 
   .tablink {
