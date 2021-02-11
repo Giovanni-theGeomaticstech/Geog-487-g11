@@ -359,10 +359,18 @@ function loadOnlineFeatLayers(){
 		  });
 
 
+		  // Binding the Popup template to the feature
 		  if (nameLayers[i] == "Bus Stops"){
-			  console.log(newfeatureLayer)
-			  newfeatureLayer.bindPopup('<p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties)
-			    //  return L.Util.template('<p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
+			  newfeatureLayer.bindPopup(function (layer){
+				  
+				let layer_name = `<h3>${nameLayers[i]}</h3>`
+				let properties = layer.feature.properties
+				let body = `<p> <strong>Stop Name:</strong> ${properties["Stop_Name"]}</p> 
+				<p><strong>Stop Number:</strong> ${properties["Stop_Num"]}</p>
+				`
+				return layer_name + body
+				// return L.Util.template('<h2>Bus Stops</h2><p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
+			});
 		  }
 
 		  newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
