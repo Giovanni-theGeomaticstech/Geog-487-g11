@@ -22,7 +22,7 @@
      <script src="https://js.arcgis.com/4.18/"></script>
 
     <script>
-      require(["esri/Map", "esri/views/MapView", "esri/widgets/LayerList"], function(Map, MapView, LayerList) {
+      require(["esri/Map", "esri/views/MapView", "esri/widgets/LayerList", "esri/layers/FeatureLayer"], function(Map, MapView, LayerList, FeatureLayer) {
         var map = new Map({
           basemap: "hybrid"
         });
@@ -33,6 +33,43 @@
           center: [-79.210724,45.32424], // Center at toronto now
           zoom: 15
         });
+
+        function loadOnlineFeatLayers(){
+            // Huntsville Boundary item 1
+            let huntsvilleLayers = [
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Boundary/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Rivers_line_huntsville/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons_huntsville/FeatureServer",
+                  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Points_huntsville/FeatureServer"
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
+                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
+            ]
+
+            for (let i = 0; i < huntsvilleLayers.length; i++){
+                  var newfeatureLayer = new FeatureLayer({
+                        url: huntsvilleLayers[i]
+                        // popupTemplate:
+                  });
+                  //https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
+                  // search for popupTemplate
+                  // {}
+                  // Do it For emergency stops (index 5)
+                  // do it for Bustops (index 2)
+                  map.add(newfeatureLayer)
+                  // Test it out
+                  if (i == huntsvilleLayers.length - 1){
+                        // createFeatureTable(newfeatureLayer)
+                  }
+            }    
+      }
+      loadOnlineFeatLayers()
+
 
           var layerList = new LayerList({
             view: view
