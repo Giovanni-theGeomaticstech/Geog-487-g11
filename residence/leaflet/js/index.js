@@ -357,6 +357,14 @@ function loadOnlineFeatLayers(){
 				url: huntsvilleLayers[i],
 				// fields: // We get an array of fields
 		  });
+
+
+		  if (nameLayers[i] == "Bus Stops"){
+			  console.log(newfeatureLayer)
+			  newfeatureLayer.bindPopup('<p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties)
+			    //  return L.Util.template('<p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
+		  }
+
 		  newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
 			  let layer = feature.layer
 			  let layerJson = layer.toGeoJSON()
