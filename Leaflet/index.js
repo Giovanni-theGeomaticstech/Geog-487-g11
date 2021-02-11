@@ -78,7 +78,8 @@ var greenIcon = new LeafIcon({
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 var drawControl = new L.Control.Draw({
-	position: 'bottomleft',
+	// position: 'bottomleft',
+	// container: document.getElementById("toolbar"),
 	draw: {
 		polygon: {
 			shapeOptions: {
@@ -161,50 +162,57 @@ function metaFormatHtml(attributes){
 
 function addBtnFunc(layer){
 	let unique_id;
+	let type;
 
 	let name = document.getElementById("input_name")
-	let type = document.getElementById("input_type")
+	// let type = document.getElementById("input_type")
 	let date_added = document.getElementById("input_date")
 	let description = document.getElementById("input_description")
 
 	if (layer.attributes){
 		unique_id = layer.attributes["uuid"]
+		type = layer.attributes["Type"]
 		// name.value = layer.attributes["Name"]
 		// type.value = layer.attributes["Type"]
 		// date_added.value = layer.attributes["Data_added"]
 		// description.value = layer.attributes["Description"]
 	}
-	else{
+	else{ // Probably never called because we create Unique ID when the Feature is Made
 		unique_id = uuid4()
 	}
-	// console.log(layer.layerType)
 	
 
     addAttributeData = {
         "Name": name.value,
-        "Type": type.value,//layer.layerType,
+        "Type": type,
         "uuid": unique_id, // Probably automatically crea
         "ObjectID": unique_id ,
         "Data_added": date_added.value,
         "Description": description.value,
     }
-    // console.log(addAttributeData)
 
-	layer.attributes = addAttributeData // We add the corresponding meta data
+	let layerJson = layer.toGeoJSON()
+
+	layer.attributes = addAttributeData // We add the corresponding metadata
+	layerJson.attributes = addAttributeData // We add the information to the JSON
+
+	updateExistingFeature("residence", unique_id, layerJson, type)
+
+	// HERE We Create the POPUP
 	let popup = metaFormatHtml(addAttributeData)
 	
-
 	// Add the popup to the layer
 	layer.bindPopup(popup)
 
-	// Close the form
+	// CLOSE THE FORM
 	formOpen.style.display = "none";
+
+	// Clear out the form information
 	name.value = ""
-	type.value = ""
+	// type.value = ""
 	date_added.value = ""
 	description.value = ""
 
-	// Clear out the form information
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -214,28 +222,20 @@ function addBtnFunc(layer){
 // Feature Group.on click event
 // https://stackoverflow.com/questions/30849283/how-to-get-id-of-layer-in-feature-group-on-click
 // http://plnkr.co/edit/4fh7vhVet8N0iD4GE3aN?preview
-// group.eachLayer(function(layer) {
-// 	layer.on('click', function(){
-// 	 alert(this._leaflet_id);
-// 	});
-//   });
 
+let activeFeature; // The current Layer being hovered over
 map.on("mouseover", function(){
-	// console.log("here")
+	// drawControl.on('mouseover', function(tool){
+	// 	console.log('here')
+	// })
 	drawnItems.eachLayer(function(layer){
 		layer.on('mouseover', function(feature){
-			metaInfoPopup()
+			
+			metaInfoPopup() // The Form to add information
 			// Here we add the add button functionality to take the layer info
 			addInfoBtn.onclick = function(){
 				addBtnFunc(layer)
 			}
-			console.log(layer.attributes)
-			console.log(layer.toGeoJSON())
-			console.log(layer.layerType)
-			// return
-			// if(addAttributeData){
-			// 	layer.bindPopup("Hello")
-			// }
 
 		})
 	})
@@ -279,24 +279,48 @@ map.on('draw:created', function (feature) {
 });
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+map.on('click', function(){
+	drawnItems.eachLayer(function(layer){
+		layer.on('click', function(feature){
+			activeFeature = layer
+		})
+	})
+})
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // On Map Draw edit
 // https://gis.stackexchange.com/questions/259250/how-to-detect-delete-or-edit-events-in-popup-menu-created-with-leaflet-draw
-// For edit event
-// Better for the two events is to get the clicked features
+// THIS IS FOR UPDATING THE FEATURE INFORMATION
 
-map.on('draw:edited', function (evt) {
-	layer = evt.layer;
+
+
+
+map.on('draw:edited', function() {
+	let layer = activeFeature
+	let layerJson = layer.toGeoJSON()
 	console.log(layer)
-	// do something when polygon is edited
+	layerJson.attributes = layer.attributes
+	let unique_id = layerJson.attributes["uuid"]
+	let type = layerJson.attributes["Type"]
+
+	// Updating DB, this update is for Layer Geometry
+	updateExistingFeature("residence", unique_id, layerJson, type)
 });
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // On Map Draw deleted
-map.on('draw:deleted', function(feature){
-	alert(feature.layerType)
+map.on('draw:deleted', function(){
+	let layer = activeFeature
+	let layerJson = layer.toGeoJSON()
+	console.log(layer)
+	layerJson.attributes = layer.attributes
+	let unique_id = layerJson.attributes["uuid"]
+	let type = layerJson.attributes["Type"]
+
+	// Delete Layer in  DB
+	deleteFeatureObject("residence", type + "_ids", unique_id)
 })
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
