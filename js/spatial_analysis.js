@@ -42,28 +42,53 @@ export function getClusters(cluster_num, clusteredData){
 
 export function pointsWithinPolygon(points, polygonFeatureCollection){
     // Trial for now
-    let geometry = {
-        "type": "Point",
-        "coordinates": points
+    for(let i = 0; i < points.length; i++){
+        let point_geom
+        if (points[i].type = "Feature"){ // For Leaflet Data (Needs a fix for types with Features)
+            if (points[i].geometry["x"]){
+                //long, lat
+                point_geom = [points[i].geometry["x"], points[i].geometry["y"]]
+            }
+            else{
+                point_geom = [points[i].geometry.coordinates[0], points[i].geometry.coordinates[1]]
+            }
+        }
+        else{ // For Esri Data
+            point_geom = [points[i].geometry["x"], points[i].geometry["y"]]
+        }
+
+        points[i] = turf.point(point_geom, points[i].attributes)
+        if (points[i].geometry.coordinates[0] > 180){
+            points[i] = turf.toWgs84(points[i])
+        }
     }
-    points = turf.feature(geometry)
+    points = turf.featureCollection(points)
+
+    // let geometry = {
+    //     "type": "Point",
+    //     "coordinates": points
+    // }
+    // points = turf.feature(geometry)
     let servicePoints = {}
     let servicePointsInfo = {}
     turf.featureEach(polygonFeatureCollection, function (currentFeature, featureIndex){
         servicePoints[currentFeature.properties.Name] = turf.pointsWithinPolygon(points, currentFeature)
     })
     // Here we get the attribute information
+    console.log(servicePoints)
+
     for (let name in servicePoints){
-        servicePointsInfo[name] = function(){
-            let information = []
-            turf.featureEach(servicePoints[name], function(currentFeature, featureIndex){
-                let featureName = `<h4>${currentFeature.attributes.Name}</h4>`
-                let featureDescription = `<b>Description:</b><p>${currentFeature.attributes.Description}</p>`
-                let featureDescription = `<b>Date added:</b><p>${currentFeature.attributes.Date_added}</p>`
-                information.push(currentFeature.attributes.Name + "")
-            })
-        }
+        let information = []
+        turf.featureEach(servicePoints[name], function(currentFeature, featureIndex){
+            console.log(currentFeature)
+            let featureName = `<h4>${currentFeature.properties.Name}</h4>`
+            let featureId = `<b>ID:</b><p>${currentFeature.properties.uuid}</p>`
+            let featureDescription = `<b>Description:</b><p>${currentFeature.properties.Description}</p>`
+            let featureDate = `<b>Date added:</b><p>${currentFeature.properties.Date_added}</p>`
+            information.push(featureName + featureId + featureDescription + featureDate)
+            console.log(information)
+        })
+        servicePointsInfo[name] = information
     }
-    return servicePoints
-    // return turf.pointsWithinPolygon(points, polygonFeatureCollection);
+    return servicePointsInfo // this is the data
 }

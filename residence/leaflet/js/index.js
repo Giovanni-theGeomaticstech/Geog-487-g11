@@ -656,7 +656,7 @@ function serviceAreaData(serviceFeatureCollection){
 	// Here We are going to add in points from the VGI
 	let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
 	vgiFeaturesPromise.then(function(featuresList){
-		let data = pointsWithinPolygon(featuresList, serviceAreaFeatureCollection) 
+		let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) 
 	})
 	
 
