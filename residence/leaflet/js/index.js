@@ -1,16 +1,23 @@
 import { uuid4 } from "../../../js/uuid4.js"
 import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
+import { calcNearestPoint } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // Adding in Map to application
+const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
+
 var map = L.map('map', {
 	editable: true,
 	doubleClickZoom: false
   }).setView([45.32424, -79.210724], 15);
 
-  let layer = L.esri.basemapLayer('Topographic').addTo(map);
+//   let layer = L.esri.basemapLayer('Topographic').addTo(map);
+// https://developers.arcgis.com/esri-leaflet/maps/change-the-basemap-layer/
+let layer = L.esri.Vector.vectorBasemapLayer("ArcGIS:Navigation",{
+	apiKey: apiKey // Adding the API Key to the map
+}).addTo(map);
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,20 +34,47 @@ L.control.locate().addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Geocoding Search Bar
-var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+// Old Way of Search Bar
+// var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
 
-L.esri.Geocoding.geosearch({
-	position:"topright",
-	providers: [
-	arcgisOnline,
-	L.esri.Geocoding.mapServiceProvider({
-		label: 'States and Counties',
-		url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
-		layers: [2, 3],
-		searchFields: ['NAME', 'STATE_NAME']
-	})
-	]
-}).addTo(map);
+// L.esri.Geocoding.geosearch({
+// 	position:"topright",
+// 	providers: [
+// 	arcgisOnline,
+// 	L.esri.Geocoding.mapServiceProvider({
+// 		label: 'States and Counties',
+// 		url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
+// 		layers: [2, 3],
+// 		searchFields: ['NAME', 'STATE_NAME']
+// 	})
+// 	]
+// }).addTo(map);
+
+const searchControl = L.esri.Geocoding.geosearch({
+	position: "topright",
+	placeholder: "Enter an address or place e.g. 1 York St",
+	useMapBounds: false,
+	providers: [L.esri.Geocoding.arcgisOnlineProvider({
+	  apikey: apiKey,
+	  nearby: {
+		lat: -33.8688,
+		lng: 151.2093
+	  },
+	})]
+  }).addTo(map);
+
+  const results = L.layerGroup().addTo(map);
+
+  searchControl.on("results", (data) => {
+	results.clearLayers();
+	for (let i = data.results.length - 1; i >= 0; i--) {
+	  const lngLatString = `${Math.round(data.results[i].latlng.lng * 100000)/100000}, ${Math.round(data.results[i].latlng.lat * 100000)/100000}`;
+	  const marker = L.marker(data.results[i].latlng);
+	  marker.bindPopup(`<b>${lngLatString}</b><p>${data.results[i].properties.LongLabel}</p>`)
+	  results.addLayer(marker);
+	  marker.openPopup();
+	}
+  });
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -340,6 +374,7 @@ map.on('draw:deleted', function(){
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Creating and Adding the Leaflet Layer List
+let featureLayers = {}
 function loadOnlineFeatLayers(){
 	let huntsvilleLayers = [
 		  "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Boundary/FeatureServer/0",
@@ -351,7 +386,7 @@ function loadOnlineFeatLayers(){
 	]
 
 	let nameLayers = ["Huntsville Boundary", "Rivers", "Bus Stops", "Bus Routes", "Lakes and Rivers", "Historical Emergency Management Events"]
-	let featureLayers = {} // Our Layers
+	// let featureLayers = {} // Our Layers
 	for (let i = 0; i < huntsvilleLayers.length; i++){
 		  var newfeatureLayer = L.esri.featureLayer({
 				url: huntsvilleLayers[i],
@@ -372,24 +407,40 @@ function loadOnlineFeatLayers(){
 				// return L.Util.template('<h2>Bus Stops</h2><p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
 			});
 		  }
+		
+		//   https://gis.stackexchange.com/questions/264921/getting-the-number-of-layers-in-leaflet
+		  // getFeature
+		  
+		
 
-		  newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
-			  let layer = feature.layer
-			  let layerJson = layer.toGeoJSON()
-			  let area = turf.area(layerJson) // We can directly pass geojson to turf.js
-			  // http://turfjs.org/docs/#shortestPath
-			  console.log(area)
-		  })
+		
+		//   newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
+		// 	  let layer = feature.layer
+		// 	  let layerJson = layer.toGeoJSON()
+		// 	  let area = turf.area(layerJson) // We can directly pass geojson to turf.js
+		// 	  // http://turfjs.org/docs/#shortestPath
+		// 	  console.log(area)
+		//   })
 		  featureLayers[nameLayers[i]] = newfeatureLayer
+
+		  
 	}    
 	// Creates layer list and adds feature layers to map
 	// Create layer list 
-	var imagery = L.esri.basemapLayer('Imagery');
-    var topo = L.esri.basemapLayer('Topographic');
+	var imagery = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery",{
+		apiKey: apiKey // Adding the API Key to the map
+	})
+    var topo = L.esri.Vector.vectorBasemapLayer("ArcGIS:Topographic",{
+		apiKey: apiKey // Adding the API Key to the map
+	})
+	var navigation = L.esri.Vector.vectorBasemapLayer("ArcGIS:Navigation",{
+		apiKey: apiKey // Adding the API Key to the map
+	})
 
-	var baseMaps = {
-		"Imagery": imagery,
-		"Topographic": topo
+	var baseMaps = { // Now using thr vectorBasemapLayers
+		"ArcGIS:Imagery": imagery,
+		"ArcGIS:Navigation": imagery,
+		"ArcGIS:Topographic": topo
 	};
 
 	//https://www.wrld3d.com/wrld.js/latest/docs/leaflet/L.Control.Layers/
@@ -402,6 +453,12 @@ loadOnlineFeatLayers()
 
 
 
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -411,23 +468,6 @@ loadOnlineFeatLayers()
 
 
 // Adding features to the client side feature layers
-
-      
-// function addClientFeatureLayer(type, featureJson){
-
-
-// 	switch(type){
-// 		  case "point":
-// 				featureJson.symbol = point_info.symbol
-// 				break
-// 		  case "line" || "polyline":
-// 				featureJson.symbol = polyline_info.symbol
-// 				break
-// 		  case "polygon":
-// 				featureJson.symbol = polygon_info.symbol
-// 				break
-// 	}
-// }
 
 
 function loadDBFeatures(){
@@ -484,10 +524,151 @@ function loadDBFeatures(){
                   alert("Layer with url:" + url + " does not exists!")
             }
       }
-// Fetch file info
+
+
+// Routing Feature
+// Layer Group for start/end-points
+const startLayerGroup = L.layerGroup().addTo(map);
+const endLayerGroup = L.layerGroup().addTo(map);
+// Layer Group for route lines
+const routeLines = L.layerGroup().addTo(map);
 
 
 
+
+
+
+////////////////////////////////////////////////////////////////////////////
+function updateRoute(startCoords, endCoords, directionsWidget) {
+	// Create the arcgis-rest-js authentication object to use later.
+	const authentication = new arcgisRest.ApiKey({
+	  key: apiKey
+	});
+
+	// make the API request
+	arcgisRest
+	  .solveRoute({
+		stops: [startCoords, endCoords],
+		endpoint: "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve",
+		authentication
+	  })
+	  .then((response) => {
+		// Show the result route on the map.
+		routeLines.clearLayers();
+		L.geoJSON(response.routes.geoJson).addTo(routeLines);
+		map.setView([startCoords[1], startCoords[0]], 16) // We want to move the map to start location
+		
+
+		// Show the result text directions on the map.
+		const directionsHTML = response.directions[0].features.map((f) => f.attributes.text).join("<br/>");
+		directionsWidget.innerHTML = directionsHTML;
+		startCoords = null;
+		endCoords = null;
+	  })
+	  .catch((error) => {
+		console.error(error);
+		alert("There was a problem using the route service. See the console for details.");
+	  });
+  }
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+
+
+// Here make geolocation functions to be used in the application for the analysis
+// Call whatever function here
+
+let calcRouteBtn = document.getElementById("calc_route")
+
+calcRouteBtn.onclick = function() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+	  alert("Geolocation is not supported by this browser.")
+	}
+  }
+
+// Here we go can use it to load in GeoJSON files
+// Reimplement function
+function getGeoJsonFromFile(file=null){
+	file = "../../../data/Huntsville_Transit.geojson"
+
+	let featureCollection = fetch (file).then(x => x.text()).then(function(data){
+		data = JSON.parse(data) // parse the data to make it JavaScript object
+		// var center = turf.center(data);
+		// console.log(center)
+		console.log(data)
+		return data
+	 })
+	return featureCollection
+}
+  
+function showPosition(position) {
+	// ROUTING DIRECTIONS RELATED
+	// Add a DOM Node to display the text routing directions
+	const directionsWidget = document.createElement("div");
+	directionsWidget.id = "directions";
+	directionsWidget.innerHTML = "Starting Route Directions";
+	document.body.appendChild(directionsWidget);
+
+
+	// let currentStep = "end"; // Make it start at end for now
+	let startCoords, endCoords;
+	
+	// map.on("click", function(evt){
+	// 	const coordinate = [evt.latlng.lng, evt.latlng.lat]
+	// 	console.log(coordinate)
+	// })
+	
+	let curr_position = [position.coords.longitude, position.coords.latitude]
+	// startCoords = curr_position // Use this for GPS coordinates
+	startCoords = [-79.21996483220589, 45.31764832102381] // Here I use test coordinates
+
+	let featureCollects = getGeoJsonFromFile() // Note this is a promise object
+	featureCollects.then(function(featureCollection){
+		let endPoint = calcNearestPoint(startCoords, featureCollection)
+		endCoords = turf.getCoords(endPoint)
+
+		// Rest of code here
+
+		if (startCoords){ // clean everything out
+			startLayerGroup.clearLayers();
+			endLayerGroup.clearLayers();
+			routeLines.clearLayers();
+			L.marker(startCoords).addTo(startLayerGroup);
+		}
+		if (endCoords){
+			L.marker(endCoords).addTo(endLayerGroup);
+		}
+		if (startCoords && endCoords) {
+			updateRoute(startCoords, endCoords, directionsWidget);
+		  }
+	})
+
+	// endCoords = [-79.21008993085984, 45.33068329768059] // test coordinates
+
+	////////////////////////////////////////////////////////////////
+	// Make a function
+	// Test coordinates
+	// [-79.21996483220589, 45.31764832102381]
+	// [-79.21008993085984, 45.33068329768059]
+
+	// if (startCoords){ // clean everythin out
+	// 	startLayerGroup.clearLayers();
+    //     endLayerGroup.clearLayers();
+    //     routeLines.clearLayers();
+    //     L.marker(startCoords).addTo(startLayerGroup);
+	// }
+	// if (endCoords){
+	// 	L.marker(endCoords).addTo(endLayerGroup);
+	// }
+	// if (startCoords && endCoords) {
+	// 	updateRoute(startCoords, endCoords, directionsWidget);
+	//   }
+	
+	console.log("Latitude: " + position.coords.latitude +
+	"<br>Longitude: " + position.coords.longitude)
+}
 
 // https://www.w3schools.com/js/js_timing.asp
 // Timing JS
