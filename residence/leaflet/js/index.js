@@ -6,7 +6,6 @@ import { calcNearestPoint, pointsWithinPolygon } from "../../../js/spatial_analy
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // Adding in Map to application
-const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
 
 var map = L.map('map', {
 	editable: true,

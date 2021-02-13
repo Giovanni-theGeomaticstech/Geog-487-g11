@@ -87,7 +87,6 @@ require([
         // SETTING UP OUR MAP LAYER
         // All basemaps
         // Change out
-        const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
         esriConfig.apiKey = apiKey
         
         var map = new Map({
@@ -745,7 +744,7 @@ require([
 
       ///////////////////////////////////////////////////////////////////////////
       // We use this function to create the new point graphic to the layer
-      function addGraphic(type, point, serviceArea=null) {
+      function addPointGraphic(type, point, serviceArea=null) {
             let graphic;
             if (serviceArea){ // If we are dealing with a service area point
                   view.graphics.removeAll();
@@ -810,8 +809,8 @@ require([
                         view.graphics.removeAll();
                   }
                   if (startCoords && endCoords) {
-                        startPointMarker = addGraphic("origin", startCoords)
-                        endPointMarker = addGraphic("destination", endCoords);
+                        startPointMarker = addPointGraphic("origin", startCoords)
+                        endPointMarker = addPointGraphic("destination", endCoords);
                         view.center = startCoords
                         view.zoom = 16
                         
@@ -857,7 +856,7 @@ require([
             if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(showPosition);
             } else {
-            alert("Geolocation is not supported by this browser.")
+                  alert("Geolocation is not supported by this browser.")
             }
       }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -870,17 +869,113 @@ require([
       });
 
 
-      // The function to generate the point (location of interests) when one double clicks on the map
-      // It will call sericeAreaData to generate data for the service area
-      
-      function serviceArea(){
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Gathers Data from points in the Service area generated through VGI
+      function serviceAreaData(serviceFeatureCollection){
+            var serviceAreaInfoDump = document.getElementById("servicedump")
+            serviceAreaInfoDump.innerHTML = ""
+
+            // Here We are going to add in points from the VGI
+            let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
+            vgiFeaturesPromise.then(function(featuresList){
+                  let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
+
+                  for (let serviceName in data){
+                        let serviceHeader = `<h2>${serviceName}</h2>`
+                        serviceAreaInfoDump.innerHTML += serviceHeader 
+                        for (let i = 0; i < data[serviceName].length; ++i){
+                              serviceAreaInfoDump.innerHTML += data[serviceName][i] // That feature content
+                        }
+                  }
+            })
+      }
+///////////////////////////////////////////////////////////////////////////////////////
+      // Execute the Service Area Task
+      
+      function executeServiceAreaTask(serviceAreaParams) {
+
+            return serviceAreaTask.solve(serviceAreaParams)
+              .then(function(result){
+                if (result.serviceAreaPolygons.length) {                  
+                  // Draw each service area polygon
+                  result.serviceAreaPolygons.forEach(function(graphic){
+                  graphic.symbol = {
+                  type: "simple-fill",
+                  color: "rgba(255,50,50,.25)"
+                  }
+                  view.graphics.add(graphic,0);
+                  });
+                  let serviceAreaPolygons = result.serviceAreaPolygons
+                  return serviceAreaPolygons // Here we return the service area polygons
+                }
+              }, function(error){
+                console.log(error);
+                alert("Error in Service Area Calculation")
+              });
+    
       }
 
+      // Create Service Area Params
+      function createServiceAreaParams(locationGraphic, driveTimeCutoffs, outSpatialReference) {
+
+            // Create one or more locations (facilities) to solve for
+            const featureSet = new FeatureSet({
+              features: [locationGraphic]
+            });
+
+            // Set all of the input parameters for the service
+            const taskParameters = new ServiceAreaParams({
+                  facilities: featureSet,
+                  defaultBreaks: driveTimeCutoffs,
+                  trimOuterPolygon: true,
+                  outSpatialReference: outSpatialReference
+            });
+            return taskParameters;
+    
+      }
+
+
+      // The function to generate the point (location of interests) when one double clicks on the map
+      // It will call sericeAreaData to generate data for the service area
+      function serviceArea(){
+            view.on("double-click", function(event){
+                  const locationGraphic = addPointGraphic("point", event.mapPoint, "service")
+
+                  const driveTimeCutoffs = [5,10,15]; // Minutes
+                  // Create the Service Srea Params
+                  const serviceAreaParams = createServiceAreaParams(locationGraphic, driveTimeCutoffs, view.spatialReference);
+                  
+                  let serviceAreaFeatures = executeServiceAreaTask(serviceAreaParams); // Execute the Service area
+                  serviceAreaFeatures.then(function(features){
+                        for (let i = 0; i < features.length; i++){
+                              let featureJSON = features[i].toJSON()
+                              // Changing it to feature geojson
+                              
+                              featureJSON.properties = featureJSON.attributes
+                              featureJSON.type = "Feature"
+                              
+                              featureJSON.geometry = {
+                                    coordinates: featureJSON.geometry.rings,
+                                    type:"Polygon"
+                              }
+                              delete featureJSON.attributes
+                              delete featureJSON.popupTemplate
+                              delete featureJSON.symbol
+                              features[i] = featureJSON
+                        }
+                        // Changing it to Turf FeatureCollection
+                        let featureCollection = turf.featureCollection(features)
+                        console.log(featureCollection)
+                        serviceAreaData(featureCollection)
+                  }) // Closing for ServiceAreaFeatures
+            })
+      }
+
+      serviceArea()
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 
 
   }
