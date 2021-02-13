@@ -34,3 +34,36 @@ export function getClusters(cluster_num, clusteredData){
 }
 
 ////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////
+// Points Within Polygon
+// https://turfjs.org/docs/#pointsWithinPolygon
+
+export function pointsWithinPolygon(points, polygonFeatureCollection){
+    // Trial for now
+    let geometry = {
+        "type": "Point",
+        "coordinates": points
+    }
+    points = turf.feature(geometry)
+    let servicePoints = {}
+    let servicePointsInfo = {}
+    turf.featureEach(polygonFeatureCollection, function (currentFeature, featureIndex){
+        servicePoints[currentFeature.properties.Name] = turf.pointsWithinPolygon(points, currentFeature)
+    })
+    // Here we get the attribute information
+    for (let name in servicePoints){
+        servicePointsInfo[name] = function(){
+            let information = []
+            turf.featureEach(servicePoints[name], function(currentFeature, featureIndex){
+                let featureName = `<h4>${currentFeature.attributes.Name}</h4>`
+                let featureDescription = `<b>Description:</b><p>${currentFeature.attributes.Description}</p>`
+                let featureDescription = `<b>Date added:</b><p>${currentFeature.attributes.Date_added}</p>`
+                information.push(currentFeature.attributes.Name + "")
+            })
+        }
+    }
+    return servicePoints
+    // return turf.pointsWithinPolygon(points, polygonFeatureCollection);
+}

@@ -1,6 +1,6 @@
 import { uuid4 } from "../../../js/uuid4.js"
 import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
-import { calcNearestPoint } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
+import { calcNearestPoint, pointsWithinPolygon } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -275,7 +275,6 @@ map.on("mouseover", function(){
 	})
 })
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -331,9 +330,6 @@ map.on('click', function(){
 // On Map Draw edit
 // https://gis.stackexchange.com/questions/259250/how-to-detect-delete-or-edit-events-in-popup-menu-created-with-leaflet-draw
 // THIS IS FOR UPDATING THE FEATURE INFORMATION
-
-
-
 
 map.on('draw:edited', function() {
 	let layer = activeFeature
@@ -407,20 +403,6 @@ function loadOnlineFeatLayers(){
 				// return L.Util.template('<h2>Bus Stops</h2><p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
 			});
 		  }
-		
-		//   https://gis.stackexchange.com/questions/264921/getting-the-number-of-layers-in-leaflet
-		  // getFeature
-		  
-		
-
-		
-		//   newfeatureLayer.on("click", function(feature){ // Adding the click event to the feature layer
-		// 	  let layer = feature.layer
-		// 	  let layerJson = layer.toGeoJSON()
-		// 	  let area = turf.area(layerJson) // We can directly pass geojson to turf.js
-		// 	  // http://turfjs.org/docs/#shortestPath
-		// 	  console.log(area)
-		//   })
 		  featureLayers[nameLayers[i]] = newfeatureLayer
 
 		  
@@ -439,7 +421,7 @@ function loadOnlineFeatLayers(){
 
 	var baseMaps = { // Now using thr vectorBasemapLayers
 		"ArcGIS:Imagery": imagery,
-		"ArcGIS:Navigation": imagery,
+		"ArcGIS:Navigation": navigation,
 		"ArcGIS:Topographic": topo
 	};
 
@@ -533,31 +515,36 @@ const endLayerGroup = L.layerGroup().addTo(map);
 // Layer Group for route lines
 const routeLines = L.layerGroup().addTo(map);
 
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////
+// Generates the Route
 function updateRoute(startCoords, endCoords, directionsWidget) {
+	//https://developers.arcgis.com/esri-leaflet/route-and-directions/find-a-route-and-directions/
 	// Create the arcgis-rest-js authentication object to use later.
 	const authentication = new arcgisRest.ApiKey({
 	  key: apiKey
 	});
 
 	// make the API request
+	
 	arcgisRest
 	  .solveRoute({
 		stops: [startCoords, endCoords],
+		barriers: {
+			geometryType:"esriGeometryPoint",
+			spatialReference: {wkid: 4326, latestWkid: 4326},
+			//https://turfjs.org/docs/#feature
+			features: [L.point(45.31694670076911, -79.2179239581651)], // Try making this a feature
+		},
 		endpoint: "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve",
 		authentication
 	  })
 	  .then((response) => {
+		console.log(response)
 		// Show the result route on the map.
 		routeLines.clearLayers();
 		L.geoJSON(response.routes.geoJson).addTo(routeLines);
 		map.setView([startCoords[1], startCoords[0]], 16) // We want to move the map to start location
-		
+
 
 		// Show the result text directions on the map.
 		const directionsHTML = response.directions[0].features.map((f) => f.attributes.text).join("<br/>");
@@ -572,22 +559,11 @@ function updateRoute(startCoords, endCoords, directionsWidget) {
   }
 ////////////////////////////////////////////////////////////////////////////
 
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////
-
-
-// Here make geolocation functions to be used in the application for the analysis
-// Call whatever function here
-
-let calcRouteBtn = document.getElementById("calc_route")
-
-calcRouteBtn.onclick = function() {
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(showPosition);
-	} else {
-	  alert("Geolocation is not supported by this browser.")
-	}
-  }
-
 // Here we go can use it to load in GeoJSON files
 // Reimplement function
 function getGeoJsonFromFile(file=null){
@@ -606,19 +582,15 @@ function getGeoJsonFromFile(file=null){
 function showPosition(position) {
 	// ROUTING DIRECTIONS RELATED
 	// Add a DOM Node to display the text routing directions
-	const directionsWidget = document.createElement("div");
-	directionsWidget.id = "directions";
+	// const directionsWidget = document.createElement("div");
+	// directionsWidget.id = "directions";
+	let directionsWidget = document.getElementById("directions")
 	directionsWidget.innerHTML = "Starting Route Directions";
 	document.body.appendChild(directionsWidget);
 
 
 	// let currentStep = "end"; // Make it start at end for now
 	let startCoords, endCoords;
-	
-	// map.on("click", function(evt){
-	// 	const coordinate = [evt.latlng.lng, evt.latlng.lat]
-	// 	console.log(coordinate)
-	// })
 	
 	let curr_position = [position.coords.longitude, position.coords.latitude]
 	// startCoords = curr_position // Use this for GPS coordinates
@@ -628,47 +600,140 @@ function showPosition(position) {
 	featureCollects.then(function(featureCollection){
 		let endPoint = calcNearestPoint(startCoords, featureCollection)
 		endCoords = turf.getCoords(endPoint)
+		
 
 		// Rest of code here
-
+		let startPointMarker, endPointMarker
 		if (startCoords){ // clean everything out
 			startLayerGroup.clearLayers();
 			endLayerGroup.clearLayers();
 			routeLines.clearLayers();
-			L.marker(startCoords).addTo(startLayerGroup);
+			startPointMarker = L.marker([startCoords[1], startCoords[0]]).addTo(startLayerGroup); // Adding the start coords to the map
+		
 		}
 		if (endCoords){
-			L.marker(endCoords).addTo(endLayerGroup);
+			endPointMarker = L.marker([endCoords[1], endCoords[0]]).addTo(endLayerGroup); // Adding the end coords to map
 		}
 		if (startCoords && endCoords) {
+			startPointMarker.bindPopup("The Start Point")
+			let endPointprops =  endPoint.properties
+			endPointMarker.bindPopup(`<h3>${endPointprops["Stop_Name"]}<h3></br><p>Stop Num: ${endPointprops["Stop_Num"]}</p>`)
+
 			updateRoute(startCoords, endCoords, directionsWidget);
 		  }
 	})
-
-	// endCoords = [-79.21008993085984, 45.33068329768059] // test coordinates
-
-	////////////////////////////////////////////////////////////////
-	// Make a function
-	// Test coordinates
-	// [-79.21996483220589, 45.31764832102381]
-	// [-79.21008993085984, 45.33068329768059]
-
-	// if (startCoords){ // clean everythin out
-	// 	startLayerGroup.clearLayers();
-    //     endLayerGroup.clearLayers();
-    //     routeLines.clearLayers();
-    //     L.marker(startCoords).addTo(startLayerGroup);
-	// }
-	// if (endCoords){
-	// 	L.marker(endCoords).addTo(endLayerGroup);
-	// }
-	// if (startCoords && endCoords) {
-	// 	updateRoute(startCoords, endCoords, directionsWidget);
-	//   }
 	
 	console.log("Latitude: " + position.coords.latitude +
 	"<br>Longitude: " + position.coords.longitude)
 }
+
+// Here make geolocation functions to be used in the application for the analysis
+
+let calcRouteBtn = document.getElementById("calc_route")
+
+calcRouteBtn.onclick = function() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+	  alert("Geolocation is not supported by this browser.")
+	}
+}
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Service Area - For Governments
+// https://developers.arcgis.com/esri-leaflet/route-and-directions/find-service-areas/
+
+
+// Layer for Service Area
+const serviceLayerGroup = L.layerGroup().addTo(map)
+
+// Layer for points of service areas 
+let serviceStartPoints = L.layerGroup().addTo(map);
+
+function serviceAreaData(serviceFeatureCollection){
+	// Here We are going to add in points from the VGI
+	let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
+	vgiFeaturesPromise.then(function(featuresList){
+		let data = pointsWithinPolygon(featuresList, serviceAreaFeatureCollection) 
+	})
+	
+
+}
+
+function serviceArea(){
+	const authentication = new arcgisRest.ApiKey({
+		key: apiKey
+	  });
+  
+	// When the map is clicked, call the service area REST service with the
+    // clicked point and display the results.
+    map.on("dblclick", (curr_location) => {
+
+		// Clear the previous results
+		serviceStartPoints.clearLayers();
+		serviceLayerGroup.clearLayers();
+  
+		// Add the source point
+		L.marker(curr_location.latlng).addTo(serviceStartPoints);
+  
+		// Make the API request
+		arcgisRest
+		  .serviceArea({
+			endpoint: "https://route-api.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea",
+			authentication,
+			facilities: [[curr_location.latlng.lng, curr_location.latlng.lat]]
+		  })
+		  .then((response) => { // Shorthand JS for function calls
+			// Show the result route on the map.
+			let layers = L.geoJSON(response.saPolygons.geoJson, {
+			  style: (feature) => { // Short Hand JS for Function calls
+				const style = {
+				  fillOpacity: 0.5,
+				  weight: 1
+				}
+				if(feature.properties.FromBreak === 0) {
+					// feature.bindPopup("5 minutes service area")
+				  style.color = 'hsl(210, 80%, 40%)';
+				  feature.properties.popupTemplate = "<h1>Hello</h1>"
+				} else if(feature.properties.FromBreak === 5) {
+					// feature.bindPopup("10 minutes service area")
+				  style.color = "hsl(210, 80%, 60%)";
+				} else {
+					// feature.bindPopup("15 minutes service area")
+				  style.color = "hsl(210, 80%, 80%)";
+				}
+				return style;
+			  },
+			  //				// https://stackoverflow.com/questions/14506989/leaflet-popup-with-additional-information-from-geojson
+
+			  onEachFeature: function (feature, layer) {
+				layer.bindPopup(`<h3>Service Area-${feature.properties.Name} + minutes</h3>`);
+			}
+			}).addTo(serviceLayerGroup);
+			let serviceAreaFeatureCollection = response.saPolygons.geoJson
+			serviceAreaData(serviceAreaFeatureCollection)
+
+		})
+		  .catch((error) => {
+			console.error(error);
+			alert("There was a problem using the route service. See the console for details.");
+		  });
+	  });
+}
+serviceArea()
+
+
+
+
+
+
+
+
+
+
+
 
 // https://www.w3schools.com/js/js_timing.asp
 // Timing JS

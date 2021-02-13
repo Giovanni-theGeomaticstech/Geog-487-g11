@@ -61,11 +61,11 @@ html, body{
 /*Code to create the directions widget */
 #directions {
   position: absolute;
-  z-index: 1000;
+  /* z-index: 1000; */
   width: 30%;
   max-height: 50%;
-  right: 20px;
-  top: 20px;
+  /* right: 20px;*/
+  /* top: 20px; */
   overflow-y: auto; /* Show a scrollbar if needed */
   background: white;
   font-family: Arial, Helvetica, Verdana;
