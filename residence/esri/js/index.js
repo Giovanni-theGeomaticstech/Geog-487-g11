@@ -10,9 +10,15 @@ import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeature
 
 import { uuid4 } from "../../../js/uuid4.js" // Unique IDs
 
+import { calcNearestPoint, pointsWithinPolygon } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
+
+// close to achieve cdn node
+// require("")
+// require('dotenv').config()
 
 require([
     /* REQUIRE HOLDS ALL THE MODULES/LIBRARIES WE WILL BE USING */
+    "esri/config", // To config api key to 
     "esri/Map",
     "esri/views/MapView",
 
@@ -50,6 +56,19 @@ require([
     // Table Lists
     "esri/widgets/TableList",
 
+    // RouteTasks
+    "esri/tasks/RouteTask",
+
+    // RouteParameters
+    "esri/tasks/support/RouteParameters",
+
+    // FeatureSet
+    "esri/tasks/support/FeatureSet",
+
+    // Service Area
+    "esri/tasks/ServiceAreaTask",
+    "esri/tasks/support/ServiceAreaParameters",
+
 
     //NodeJs
 //     "dojo/node!dotenv"
@@ -57,22 +76,29 @@ require([
   ], 
   /* NOW THE FUNCTION IS WHERE WE ADD THESE LIBRARIES*/
   /* I believe within in this function we will write all or JS code*/
-  function(Map, MapView, BasemapToggle,BasemapGallery, Track, Locate, Search, PopupTemplate, 
-      Graphic, GraphicsLayer, FeatureLayer, Sketch, Editor, LayerList, FeatureTable, TableList) { //dotenv
+  function(esriConfig, Map, MapView, BasemapToggle,BasemapGallery, 
+      Track, Locate, Search, PopupTemplate, 
+      Graphic, GraphicsLayer, FeatureLayer, 
+      Sketch, Editor, LayerList, FeatureTable, TableList,
+      RouteTask, RouteParameters, FeatureSet,
+      ServiceAreaTask, ServiceAreaParams,) { //dotenv
 
         /////////////////////////////////////////////////////////////
         // SETTING UP OUR MAP LAYER
         // All basemaps
+        // Change out
+        const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
+        esriConfig.apiKey = apiKey
+        
         var map = new Map({
-        basemap: "satellite"
+            basemap: "arcgis-imagery",
         });
 
         var view = new MapView({
-        container: "viewDiv", //We define viewDiv is what holds our div
-        map: map,
-      //   center: [-79.3832,43.6532], // Center at toronto now
-        center: [-79.210724,45.32424], // Center at toronto now
-        zoom: 15
+            container: "viewDiv", //We define viewDiv is what holds our div
+            map: map,
+            center: [-79.210724,45.32424], // Center at Huntsville
+            zoom: 15
         });
         //////////////////////////////////////////////////////////////
         
@@ -85,7 +111,7 @@ require([
 
         let basemapToggle = new BasemapToggle({
               view:view,
-              nextBasemap: "topo"
+              nextBasemap: "arcgis-navigation"
         })
         view.ui.add(basemapToggle, "bottom-right") // Adding the basemap toggle bottom rights
         
@@ -215,6 +241,7 @@ require([
       let feature_layer_points = new FeatureLayer({
             source: [], // Collection of Graphics
             fields: fields,
+            title: "Resident Data - Points",
             objectIdField: "ObjectID",
             geometryType: "point",
             spatialReference: { wkid: 4326 },
@@ -227,6 +254,7 @@ require([
       // ADDING FEATURES TO THE LINES FEATURE LAYER
       let feature_layer_lines = new FeatureLayer({
             source: [], // Collection of Graphics
+            title: "Resident Data - Lines",
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polyline",
@@ -239,6 +267,7 @@ require([
       // ADDING FEATURES TO THE POLYGON FEATURE LAYER
       let feature_layer_polygons = new FeatureLayer({
             source: [], // Collection of Graphics
+            title: "Resident Data - Polygons",
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polygon",
@@ -421,7 +450,7 @@ require([
                   })
             }     
       }
-      loadDBFeatures()
+      // Called after the online Feature Layers
 
       //////////////////////////////////////////////////////////////////////////////
 
@@ -577,12 +606,12 @@ require([
       // https://developers.arcgis.com/javascript/latest/sample-code/sandbox/index.html?sample=editing-applyedits
 
       /********************
-       * Add feature layer From Gabby
+       * Loading Predefined ArcGIS Online Layers
        * 
        * The function loadOnlineFeatLayers adds the ArcGIS online Feature layers
        * Load in predefined layers
        ********************/
-
+      let onlineFeatureLayers = {}
       function loadOnlineFeatLayers(){
             // Huntsville Boundary item 1
             let huntsvilleLayers = [
@@ -592,18 +621,14 @@ require([
                   "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
                   "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons_huntsville/FeatureServer",
                   "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Points_huntsville/FeatureServer"
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Census_sub_divisions/FeatureServer",
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/rivers_lines/FeatureServer",
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_stops/FeatureServer",
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Huntsville_Transit_bus_routes/FeatureServer",
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/lakes_and_rivers_polygons/FeatureServer",
-                  // "https://services1.arcgis.com/DwLTn0u9VBSZvUPe/arcgis/rest/services/Emergency_Management_Historical_Events/FeatureServer"
             ]
-
+            let onlineFeatureNames = ["boundary", "river_lines", "bus_stops", "bus_routes", "lakes_and_rivers", "emergency"]
             for (let i = 0; i < huntsvilleLayers.length; i++){
                   var newfeatureLayer = new FeatureLayer({
-                        url: huntsvilleLayers[i]
+                        url: huntsvilleLayers[i],
+                        visible: false,
                   });
+                  onlineFeatureLayers[onlineFeatureNames[i]] = newfeatureLayer
                   map.add(newfeatureLayer)
                   // Test it out
                   if (i == huntsvilleLayers.length - 1){
@@ -611,14 +636,13 @@ require([
                   }
             }    
       }
-      loadOnlineFeatLayers()
+      loadOnlineFeatLayers() // Features from ArcGiS Online
+      loadDBFeatures() // Feature Layers from the DB
       
-      /********************
-       * Add feature layer From Gabby
-       * 
-       * Load in layers from user input
-       ********************/
-
+      
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Loading External ArcGIS Layers
+      
       let search_btn = document.getElementById("search_btn_url")
       search_btn.onclick = function(){
             
@@ -636,12 +660,10 @@ require([
                   alert("Layer with url:" + url + " does not exists!")
             }
       }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       //Filter Feature Layer
       //https://developers.arcgis.com/javascript/latest/api-reference/esri-views-layers-support-FeatureFilter.html
- 
-      
-
 
       // Adding the Layers List
       // Untitled layers are the feature layers I created
@@ -649,8 +671,217 @@ require([
             view: view,
             container: document.getElementById("toggle_layers"), // Edit widget is defined in the index.html
           });
-      // Add widget to the top right corner of the view
-      // view.ui.add(layerList, "top-right");
+      
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ROUTE DIRECTIONS
+      const routeTask = new RouteTask({
+            url: "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World"
+      });
+
+      ///////////////////////////////////////////////////////////////////////////
+      // Here we implement the getRoute
+      function getRoute(directions=null) {
+            const routeParams = new RouteParameters({ // Here the Route Parameters that are passed over to be solved in RouteTask
+              stops: new FeatureSet({
+                features: view.graphics.toArray()
+              }),
+              polygonBarriers: onlineFeatureLayers["lakes_and_rivers"], // Serves as the Barrier in the case of flood event
+              returnDirections: true // So we can get the directions
+            });
+
+            routeTask.solve(routeParams).then(function(data) { // Here we solve the Route with Route Task
+                  console.log(data)
+                  data.routeResults.forEach(function(result) {
+                        result.route.symbol = {
+                              type: "simple-line",
+                              color: [5, 150, 255],
+                              width: 3
+                        };
+                  view.graphics.add(result.route); // The New Route added to the layer
+                  });
+
+                  // Display Directions
+                  if (data.routeResults.length > 0){
+                        // Here we are going to use some of esri's styling with the widget
+                        directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+                        // directions.style.marginTop = "0";
+                        directions.style.padding = "15px 15px 15px 30px";
+                        const directionFeatures = data.routeResults[0].directions.features;
+                  
+
+                        // Show each direction
+                        directionFeatures.forEach(function(result,i){
+                              const direction_ele = document.createElement("li");
+                              direction_ele.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " miles)";
+                              directions.appendChild(direction_ele);
+                        })
+                        // view.ui.empty("top-right")
+                        // view.ui.add(directions, "top-right")
+                  }
+            }).catch(function(error){ // Catch errors
+                  console.log(error);
+                  console.log("Error with creating route");
+            }) 
+      }
+            
+
+      ///////////////////////////////////////////////////////////////////////////
+      // Here we go can use it to load in GeoJSON files
+      // Reimplement function
+      function getGeoJsonFromFile(file=null){
+            file = "../../../data/Huntsville_Transit.geojson"
+
+            let featureCollection = fetch (file).then(x => x.text()).then(function(data){
+                  data = JSON.parse(data) // parse the data to make it JavaScript object
+                  // var center = turf.center(data);
+                  // console.log(center)
+                  console.log(data)
+                  return data
+             })
+            return featureCollection
+      }
+      ///////////////////////////////////////////////////////////////////////////
+
+      ///////////////////////////////////////////////////////////////////////////
+      // We use this function to create the new point graphic to the layer
+      function addGraphic(type, point, serviceArea=null) {
+            let graphic;
+            if (serviceArea){ // If we are dealing with a service area point
+                  view.graphics.removeAll();
+                  graphic = new Graphic({
+                        geometry:point,
+                        symbol:{
+                              type: "simple-marker",
+                              color: "white",
+                              size: 8
+                        }
+                  })
+            }else{
+                  graphic = new Graphic({
+                        symbol: {
+                          type: "simple-marker",
+                          color: (type === "origin") ? "white" : "black", // Styling the origin of point
+                          size: "8px"
+                        },
+                      geometry: {
+                            x: point[0],
+                            y: point[1],
+                            type:"point"
+                      } // Add popuptemplate
+                    });
+                      
+            }
+            view.graphics.add(graphic);
+            return graphic
+      }
+      ////////////////////////////////////////////////////////////////////////
+
+
+      ///////////////////////////////////////////////////////////////////////////
+      function showPosition(position) {
+            // ROUTING DIRECTIONS RELATED
+            // Add a DOM Node to display the text routing directions
+            // const directionsWidget = document.createElement("div");
+            // directionsWidget.id = "directions";
+            
+            let directionsWidget = document.getElementById("directions")
+            directionsWidget.innerHTML = "Starting Route Directions";
+            document.body.appendChild(directionsWidget);
+      
+            let startCoords, endCoords;
+            
+            let curr_position = [position.coords.longitude, position.coords.latitude]
+            
+            // startCoords = curr_position // Use this for GPS coordinates
+            // Note it works via tracker and by current location
+            startCoords = [-79.21996483220589, 45.31764832102381] // Here I use test coordinates
+      
+            let featureCollects = getGeoJsonFromFile() // Note this is a promise object
+            
+            featureCollects.then(function(featureCollection){
+                  let endPoint = calcNearestPoint(startCoords, featureCollection) // Find the Nearest Bus Locations
+                  endCoords = turf.getCoords(endPoint) // Getting the Coords to bus location
+                  
+                  // Rest of code here
+                  let startPointMarker, endPointMarker
+                  console.log(view.graphics.length)
+                  if (view.graphics.length >= 2){ // if we already have the start coords and endcoords added
+                        view.graphics.removeAll();
+                  }
+                  if (startCoords && endCoords) {
+                        startPointMarker = addGraphic("origin", startCoords)
+                        endPointMarker = addGraphic("destination", endCoords);
+                        view.center = startCoords
+                        view.zoom = 16
+                        
+                        startPointMarker.attributes = {
+                              ObjectID: uuid4(),
+                              uuid: uuid4(),
+                              Type: "point",
+                              Name: "Your Current location",
+                              Description: "The Start Point of the route",
+                              Data_added: Date.now()
+                        }
+                        startPointMarker.popupTemplate = point_info.popupTemplate
+
+                        endPointMarker.attributes = endPoint.properties
+                        let modTemplate = { // The template for Near Bustop to the users location
+                              title: "{Stop_Name}",
+                              outFields:["*"],
+                              content: [{
+                                    type: "fields",
+                                    fieldInfos: [{
+                                          fieldName: "Stop_Num", // The field for access the date from attributes
+                                          label: "Stop Number"
+                                        }
+                                    ]
+                              }]
+                           }
+                        
+                        endPointMarker.popupTemplate = modTemplate
+                        
+                        getRoute(directionsWidget); // We get our route
+                  } 
+            })
+            
+            console.log("Latitude: " + position.coords.latitude +
+            "<br>Longitude: " + position.coords.longitude)
+      }
+
+      // Here make geolocation functions to be used in the application for the analysis
+
+      let calcRouteBtn = document.getElementById("calc_route")
+
+      calcRouteBtn.onclick = function() {
+            if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+            alert("Geolocation is not supported by this browser.")
+            }
+      }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // SERIVICE AREA
+      const serviceAreaTask = new ServiceAreaTask({
+            url: "https://route.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea"
+      });
+
+
+      // The function to generate the point (location of interests) when one double clicks on the map
+      // It will call sericeAreaData to generate data for the service area
+      
+      function serviceArea(){
+
+      }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 
   }
 );

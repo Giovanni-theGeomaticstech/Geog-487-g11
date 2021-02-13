@@ -437,10 +437,6 @@ loadOnlineFeatLayers()
 
 
 
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -560,9 +556,6 @@ function updateRoute(startCoords, endCoords, directionsWidget) {
 ////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////
 // Here we go can use it to load in GeoJSON files
 // Reimplement function
@@ -657,7 +650,7 @@ let serviceStartPoints = L.layerGroup().addTo(map);
 // Gathers Data from points in the Service area generated through VGI
 function serviceAreaData(serviceFeatureCollection){
 	var serviceAreaInfoDump = document.getElementById("servicedump")
-	serviceAreaInfoDump.innerHTML = 
+	serviceAreaInfoDump.innerHTML = ""
 
 	// Here We are going to add in points from the VGI
 	let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data

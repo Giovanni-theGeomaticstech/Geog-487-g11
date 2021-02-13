@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="../../css/search_bar.css">
     
     <!--JAVASCRIPT-->
+   
+    <!--Spatial Analysis stuff--> <!--Put above esri files to prevent issues-->
+    <script src='https://unpkg.com/@turf/turf@6.3.0/turf.min.js'></script>
 
     <!--Database Content-->
     <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-app.js"></script>
@@ -33,6 +36,16 @@
     <!--ArcGIS Stuff and Application code-->
     <script src="https://js.arcgis.com/4.18/"></script>
     <script type="module" src="js/index.js"></script>
+     
+    <!--https://www.keycdn.com/support/requirejs-cdn-->
+    <!--Require JS-->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js"></script>
+
+     <!--https://www.jsdelivr.com/package/npm/node-dotenv-->
+     <!-- <script src="https://cdn.jsdelivr.net/npm/node-path@0.0.3/index.min.js"></script> -->
+     <!-- <script src="https://cdn.jsdelivr.net/npm/node-dotenv@1.1.1/lib/dotEnv.min.js"></script>  Now I have dotenv -->
+ 
+    
     
     
     <title>Residence</title>
@@ -78,8 +91,8 @@
     <div class = "toggle_container">
         <button class="tablink" onclick="openPage('Table', this, 'red')">Data Table</button>
         <button class="tablink" onclick="openPage('News', this, 'green')" id="defaultOpen">Flood Locator</button>
-        <button class="tablink" onclick="openPage('Contact', this, 'blue')">Not Available</button>
-        <button class="tablink" onclick="openPage('About', this, 'orange')">Not Available</button>
+        <button class="tablink" onclick="openPage('Contact', this, 'blue')">Service Content</button>
+        <button class="tablink" onclick="openPage('About', this, 'orange')">Instructions</button>
 
         <div id="Table" class="tabcontent">
         <h3>Table</h3>
@@ -88,25 +101,32 @@
         </div>
 
         <div id="News" class="tabcontent">
-        <h3>News</h3>
-        <p>Some news this fine day!</p> 
+            <h3>Route Finder</h3>
+            <button id="calc_route">Click Me</button>
+            <div id ="directions">No Directions inputed</div>
         </div>
-
+      
         <div id="Contact" class="tabcontent">
-        <h3>Not yet Available</h3>
-        <p>Coming Soon...</p>
+            <h3>Service Area </h3>
+            <p>Double Click on the Map</p>
+            <p>We have 0-5 mins, 5-10mins and 10-15 mins service area</p>
+            <div id="servicedump"></div>
         </div>
-
+    
         <div id="About" class="tabcontent">
-        <h3>Not yet Available</h3>
-        <p>Coming Soon...</p>
+            <h3>Not yet Available</h3>
+            <p>Coming Soon...</p>
         </div>
     </div>
     
 </body>
 <!-- I want this to load later-->
-<!-- <script type="module" src = "../../js/connection.js"></script> -->
 <script src="../../js/tabination.js"></script>
+
+
+
+
+
 <!--For our Search Bar JS-->
  <!-- <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js'></script> -->
 

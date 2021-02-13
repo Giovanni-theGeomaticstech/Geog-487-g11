@@ -76,7 +76,6 @@ let popupTemplate_info = {
         ]
       }]
     
-    // Date_added: "{Data_added}"
  }
 
 
