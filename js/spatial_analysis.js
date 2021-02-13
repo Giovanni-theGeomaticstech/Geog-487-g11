@@ -81,12 +81,11 @@ export function pointsWithinPolygon(points, polygonFeatureCollection){
         let information = []
         turf.featureEach(servicePoints[name], function(currentFeature, featureIndex){
             console.log(currentFeature)
-            let featureName = `<h4>${currentFeature.properties.Name}</h4>`
+            let featureName = `<b>Name:</b><p>${currentFeature.properties.Name}</p>`
             let featureId = `<b>ID:</b><p>${currentFeature.properties.uuid}</p>`
             let featureDescription = `<b>Description:</b><p>${currentFeature.properties.Description}</p>`
             let featureDate = `<b>Date added:</b><p>${currentFeature.properties.Date_added}</p>`
             information.push(featureName + featureId + featureDescription + featureDate)
-            console.log(information)
         })
         servicePointsInfo[name] = information
     }

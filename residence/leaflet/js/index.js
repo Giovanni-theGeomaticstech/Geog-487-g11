@@ -652,15 +652,28 @@ const serviceLayerGroup = L.layerGroup().addTo(map)
 // Layer for points of service areas 
 let serviceStartPoints = L.layerGroup().addTo(map);
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Gathers Data from points in the Service area generated through VGI
 function serviceAreaData(serviceFeatureCollection){
+	var serviceAreaInfoDump = document.getElementById("servicedump")
+	serviceAreaInfoDump.innerHTML = ""
+
 	// Here We are going to add in points from the VGI
 	let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
 	vgiFeaturesPromise.then(function(featuresList){
-		let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) 
-	})
-	
+		let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
 
+		for (let serviceName in data){
+			let serviceHeader = `<h2>${serviceName}</h2>`
+			serviceAreaInfoDump.innerHTML += serviceHeader 
+			for (let i = 0; i < data[serviceName].length; ++i){
+				serviceAreaInfoDump.innerHTML += data[serviceName][i] // That feature content
+			}
+		}
+	})
 }
+///////////////////////////////////////////////////////////////////////////////////////
 
 function serviceArea(){
 	const authentication = new arcgisRest.ApiKey({
@@ -706,7 +719,7 @@ function serviceArea(){
 				}
 				return style;
 			  },
-			  //				// https://stackoverflow.com/questions/14506989/leaflet-popup-with-additional-information-from-geojson
+			// https://stackoverflow.com/questions/14506989/leaflet-popup-with-additional-information-from-geojson
 
 			  onEachFeature: function (feature, layer) {
 				layer.bindPopup(`<h3>Service Area-${feature.properties.Name} + minutes</h3>`);
