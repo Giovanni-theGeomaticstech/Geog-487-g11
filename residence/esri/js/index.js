@@ -4,7 +4,7 @@
 // The Code will focus anything map related to the ArcGIS API for JAVASCRIPT
 // This file will focus on the residences
 
-import { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } from "../../../js/basis.js" // Importing our fields schema
+import { fields, point_info, BUS_stops_Popup, EMH_Popup, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData, point_stylings } from "../../../js/basis.js" // Importing our fields schema
 
 import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
 
@@ -69,6 +69,9 @@ require([
     "esri/tasks/ServiceAreaTask",
     "esri/tasks/support/ServiceAreaParameters",
 
+    // Line Symbol
+    "esri/symbols/LineSymbolMarker",
+
 
     //NodeJs
 //     "dojo/node!dotenv"
@@ -81,12 +84,14 @@ require([
       Graphic, GraphicsLayer, FeatureLayer, 
       Sketch, Editor, LayerList, FeatureTable, TableList,
       RouteTask, RouteParameters, FeatureSet,
-      ServiceAreaTask, ServiceAreaParams,) { //dotenv
+      ServiceAreaTask, ServiceAreaParams,
+      LineSymbolMarker,) { //dotenv
 
         /////////////////////////////////////////////////////////////
         // SETTING UP OUR MAP LAYER
         // All basemaps
         // Change out
+        const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
         esriConfig.apiKey = apiKey
         
         var map = new Map({
@@ -243,6 +248,7 @@ require([
             title: "Resident Data - Points",
             objectIdField: "ObjectID",
             geometryType: "point",
+            renderer: {type:"simple", symbol:point_stylings["tear_pin1"]},
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
@@ -257,6 +263,7 @@ require([
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polyline",
+            renderer: {type:"simple", symbol:polyline_info["symbol"]},
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
@@ -270,6 +277,7 @@ require([
             fields: fields,
             objectIdField: "ObjectID",
             geometryType: "polygon",
+            renderer: {type:"simple", symbol:polygon_info["symbol"]},
             spatialReference: { wkid: 4326 },
             popupTemplate:popupTemplate_info
           });
@@ -394,7 +402,7 @@ require([
 
             switch(type){
                   case "point":
-                        featureJson.symbol = point_info.symbol
+                        // featureJson.symbol = point_info.symbol
                         featureGraphic = new Graphic(featureJson) 
                         edits.addFeatures.push(featureGraphic)
                      
@@ -623,10 +631,48 @@ require([
             ]
             let onlineFeatureNames = ["boundary", "river_lines", "bus_stops", "bus_routes", "lakes_and_rivers", "emergency"]
             for (let i = 0; i < huntsvilleLayers.length; i++){
-                  var newfeatureLayer = new FeatureLayer({
-                        url: huntsvilleLayers[i],
-                        visible: false,
-                  });
+                  let newfeatureLayer;
+                  let symbol;
+                  let popupTemplate;
+
+                  if (onlineFeatureNames[i] == "bus_stops"){
+                        symbol = {
+                              type:"simple",
+                              symbol: point_stylings["bus_stops"]
+                        }
+                        popupTemplate = BUS_stops_Popup                        
+                  }
+                  else if (onlineFeatureNames[i] == "emergency"){
+                        symbol = {
+                              type:"simple",
+                              symbol: point_stylings["flag"],
+                        }
+                        popupTemplate = EMH_Popup
+                  }
+                  else if (onlineFeatureNames[i] == "boundary"){
+                        symbol = {type:"simple", symbol:polygon_info["symbol"]}
+                        symbol.symbol.color = [74, 69, 0, 0.5]
+                  }
+                  else if (onlineFeatureNames[i] == "bus_routes"){
+                        symbol = {type:"simple", symbol:polyline_info["symbol"]}
+                        symbol.symbol.color = "#A10A8A"
+                        symbol.symbol.width = 4
+                  }
+                  if (symbol){
+                        newfeatureLayer = new FeatureLayer({
+                              url: huntsvilleLayers[i],
+                              renderer:symbol, // https://developers.arcgis.com/javascript/latest/style-a-feature-layer/
+                              visible: false,
+                              popupTemplate: popupTemplate,
+                        });
+                  }
+                  else{
+                        newfeatureLayer = new FeatureLayer({
+                              url: huntsvilleLayers[i],
+                              visible: false,
+                        });
+                  }
+                  
                   onlineFeatureLayers[onlineFeatureNames[i]] = newfeatureLayer
                   map.add(newfeatureLayer)
                   // Test it out
@@ -692,12 +738,23 @@ require([
             routeTask.solve(routeParams).then(function(data) { // Here we solve the Route with Route Task
                   console.log(data)
                   data.routeResults.forEach(function(result) {
+                        // result.route.symbol ={
+                        //             type: "simple-line",
+                        //             color: "#FCB61E", // Orange
+                        //             width: 2.5
+                        // }
                         result.route.symbol = {
-                              type: "simple-line",
-                              color: [5, 150, 255],
-                              width: 3
-                        };
-                  view.graphics.add(result.route); // The New Route added to the layer
+                              color: "#FCB61E",
+                              width: 2.5,
+                              type:"simple-line",
+                              // Define a blue "x" marker at the beginning of the line
+                              marker: { // autocasts from LineSymbolMarker
+                                 style: "arrow",
+                                 color: "green",
+                                 placement: "end"
+                              }
+                           };
+                        view.graphics.add(result.route); // The New Route added to the layer
                   });
 
                   // Display Directions
@@ -746,24 +803,17 @@ require([
       // We use this function to create the new point graphic to the layer
       function addPointGraphic(type, point, serviceArea=null) {
             let graphic;
+            
             if (serviceArea){ // If we are dealing with a service area point
                   view.graphics.removeAll();
                   graphic = new Graphic({
                         geometry:point,
-                        symbol:{
-                              type: "simple-marker",
-                              color: "white",
-                              size: 8
-                        }
+                        symbol:point_stylings["locator"]
                   })
             }else{
                   graphic = new Graphic({
-                        symbol: {
-                          type: "simple-marker",
-                          color: (type === "origin") ? "white" : "black", // Styling the origin of point
-                          size: "8px"
-                        },
-                      geometry: {
+                        symbol: point_stylings["locator"],
+                        geometry: {
                             x: point[0],
                             y: point[1],
                             type:"point"

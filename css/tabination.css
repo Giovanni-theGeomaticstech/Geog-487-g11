@@ -4,7 +4,7 @@
   /* Style tab links */
  
   .toggle_container{ /* Change the container height*/
-      height: 30%;
+      height: 40%;
       border: 1px solid black;
       position: relative;
       top: -30%;
@@ -28,15 +28,16 @@
   
   /* Style the tab content (and add height:100% for full page content) */
   .tabcontent {
-    color: white;
+    color: black;
     display: none;
     padding: 100px 20px;
     height: 100%;
   }
   
-  #Table {background-color: red;}
-  #News {background-color: green;}
-  #Contact {background-color: blue;}
-  #About {background-color: orange;}
+
+  #Table {background-color: whitesmoke;}
+  #RouteLocator {background-color: whitesmoke;}
+  #Contact {background-color: whitesmoke;}
+  #About {background-color: whitesmoke;}
   
     /*************************************************************/

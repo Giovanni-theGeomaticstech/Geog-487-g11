@@ -11,7 +11,7 @@ Date Last Edited: January 29, 2021
 // import { uuid4 } from "./uuid4.js" // Unique IDs
 
 
-// The Schema for our feature layer
+// The VGI Schema for our feature layer
 const fields = [
     {
       name: "ObjectID",
@@ -44,10 +44,12 @@ const fields = [
       type: "string"
     }
   ]
+ //////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOW POPUP INFO STYLING
+// VGI POPUP INFO STYLING
 // Maybe add type later
 // Note "{ field_name }" field name is from the schema
+
 let popupTemplate_info = {
     // id: "{ObjectID}",
     title: "{Name}",
@@ -75,11 +77,55 @@ let popupTemplate_info = {
         },
         ]
       }]
-    
  }
 
+ // Bus Stops POPUP
 
 
+let BUS_stops_Popup = { // The template for Near Bustop to the users location
+  title: "{Stop_Name}",
+  outFields:["*"],
+  content: [{
+        type: "fields",
+        fieldInfos: [{
+              fieldName: "Stop_Num", 
+              label: "Stop Number"
+            }
+        ]
+  }]
+}
+
+ // Emergency Management Historical Events POPUP
+
+let EMH_Popup = { 
+  title: "{EVENT_TYPE}",
+  outFields:["*"],
+  content: [{
+        type: "fields",
+        fieldInfos: [{
+              fieldName: "DISTRICT_N", // The field for access the date from attributes
+              label: "District Number"
+            },
+            {
+              fieldName: "EVENT_YEAR", // The field for access the date from attributes
+              label: "Event year"
+            },
+            {
+              fieldName: "EVENT_NUMB", // The field for access the date from attributes
+              label: "Event count"
+            },
+            {
+              fieldName: "EVACUATION", // The field for access the date from attributes
+              label: "Evacuated ?"
+            },
+            {
+              fieldName: "EVENT_DESC", // The field for access the date from attributes
+              label: "Description"
+            },
+        ]
+  }]
+}
+ //////////////////////////////////////////////////////////////////////////////////////////////
  // FOR ALL THE GEOMETRY BELOW THE INFORMATION IS A SAMPLE DATASET
  // THIS WOULD BE HOW THE DATASET WOULD BE LOADED FROM THE FIREBASE DATABASE 
  // WITH THAT UNIQUE ID
@@ -119,6 +165,45 @@ let point_info =  {
     popupTemplate:popupTemplate_info
 }
 
+// const webStyleSymbol = new WebStyleSymbol({
+//   name: "bus-station",
+//   styleName: "Esri2DPointSymbolsStyle"
+// });
+
+
+//https://developers.arcgis.com/javascript/latest/esri-web-style-symbols-2d/
+
+// ArcGIS Javascript API Point styling
+let point_stylings = {
+  locator:{ // Current Locations
+    type: "picture-marker",  // autocasts as new SimpleMarkerSymbol()
+    color: "#0E91E3",
+    url: "/images/locator_1.gif",
+    width: "100px",
+    height: "100px"
+  },
+  bus_stops:{ // bustops
+    type:"web-style", 
+    styleName: "Esri2DPointSymbolsStyle",
+    name: "bus-station"
+  },
+  tear_pin1:{ //vgi
+    type:"web-style",
+    styleName: "Esri2DPointSymbolsStyle",
+    name: "tear-pin-1"
+  },
+  tear_pin2:{ //vgi
+    type:"web-style",
+    styleName: "Esri2DPointSymbolsStyle",
+    name: "tear-pin-2"
+  },
+  flag:{ // Use these for historing events
+    type:"web-style",
+    styleName: "Esri2DPointSymbolsStyle",
+    name: "flag"
+  }
+}
+
 
 // Line geometry standard
 // Create a line geometry
@@ -142,8 +227,8 @@ let polyline_info = {
     },
     symbol:{
         type: "simple-line",
-        color: [226, 119, 40], // Orange
-        width: 2
+        color: "#D11349", // Orange
+        width: 5
     },
     popupTemplate:popupTemplate_info
 }
@@ -199,4 +284,4 @@ let deleteFeaturesData = {
 
 
       
-export { fields, point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData } // Making the fields variable accessible to other files
+export { fields, BUS_stops_Popup, EMH_Popup ,point_info, polyline_info, polygon_info, popupTemplate_info, addFeaturesData, updateFeaturesData, deleteFeaturesData, point_stylings} // Making the fields variable accessible to other files

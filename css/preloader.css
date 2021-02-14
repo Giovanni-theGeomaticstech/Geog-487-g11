@@ -26,7 +26,7 @@ img {
     right: 0;
     bottom: 0;
   z-index:1;
-  background:#4a4a4a;
+  background:black;
 }
 
 
@@ -45,8 +45,8 @@ img {
 }
 .loader {
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   z-index:3;
   border: 4px solid #Fff;
@@ -58,7 +58,7 @@ img {
   vertical-align: top;
   display: inline-block;
   width: 100%;
-  background-color: #fff;
+  background-color: greenyellow;
   animation: loader-inner 2s infinite ease-in;
 }
 

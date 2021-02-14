@@ -51,6 +51,7 @@ html, body{
     position: relative;
     height: 70%;
     width: 25%;
+    overflow-y:auto;
   }
 
   /* Get elements to be in the same block */
