@@ -22,7 +22,7 @@
     integrity="sha512-K0Vddb4QdnVOAuPJBHkgrua+/A9Moyv8AQEWi0xndQ+fqbRfAFd47z4A9u1AW/spLO0gEaiE1z98PK1gl5mC5Q=="
     crossorigin=""></script>
   
-  <link rel ="stylesheet" href="index.css"/>
+  <link rel ="stylesheet" href="css/index.css"/>
 
  
 
@@ -96,13 +96,13 @@
   <!--End Pre Loader-->
 
   <div class="topnav">
-    <a class="active" href="#home">Home</a>
-    <a href="#news">News</a>
-    <a href="#contact">Contact</a>
-    <div class="topnav-right">
-      <a href="#search">Search</a>
-      <a href="#about">About</a>
-    </div>
+    <a class="active" href="../../index.html"><b>3GN Tech - Home</b></a>
+        <div class="topnav-right">
+            <a href="https://www.huntsville.ca/en/index.aspx">Huntsville - Home</a>
+            <a href="https://www.huntsville.ca/Modules/News/Search.aspx">News</a>
+            <a href="https://www.huntsville.ca/Modules/contact/search.aspx?s=fp8cBTjOJaCUAUEUxjc3JQeQuAleQuAl">Contact</a>
+            <a href="https://www.huntsville.ca/en/roads-sidewalks-and-transit/roads-sidewalks-and-transit.aspx">Transit</a> 
+        </div>
   </div>
 
   <div class="layerContainer">
@@ -148,17 +148,18 @@
     <button class="tablink" onclick="openPage('Table', this, '#4CAF50')">Data Table</button>
         <button class="tablink" onclick="openPage('RouteLocator', this, '#4CAF50')" id="defaultOpen">Route Locator</button>
         <button class="tablink" onclick="openPage('ServiceArea', this, '#4CAF50')">Service Area</button>
-        <button class="tablink" onclick="openPage('NotAvailable', this, '#4CAF50')">Not Available</button>
+        <button class="tablink" onclick="openPage('Instructions', this, '#4CAF50')">Instructions</button>
 
     <div id="Table" class="tabcontent">
     <h3>Table</h3>
     <div id = "tableInfo" style="height: 400px"></div>
+      <p>Under Development</p>
     <!-- <p></p> -->
     </div>
 
     <div id="RouteLocator" class="tabcontent">
       <h3>Route Locator</h3>
-      <p> Generates a route from current location to the nearest bus stop while avoiding lakes and rivers</p>
+      <p> Generates a route from current location to the nearest bus stop while avoiding lakes and rivers.</p>
       <br>
       <button class="analysisBtns" id="calc_route">Click to Generate Route</button>
       <p></p>
@@ -173,9 +174,30 @@
         <div id="servicedump"></div>
     </div>
 
-    <div id="NotAvailable" class="tabcontent">
-        <h3>Not yet Available</h3>
-        <p>Coming Soon...</p>
+    <div id="Instructions" class="tabcontent">
+        <h3>Instructions</h3>
+        </br>
+
+        <h4>Adding/Editing Meta Data to Feature</h4>
+        <p>
+          <ul>
+            <li>To add/edit meta data to a feature you must first click on the created feature.</li>
+            <li>A box will popup to the left of the screen</li>
+            <li>Fill out the box information and press the <b>Update Information Button</b></li>
+            <li>Now if you were to re-click on the feature, a popup will show the updated information</li>
+            <li>Note if the feature was already in the database refresh the page</li>
+            <li>Re-click the feature</li>
+          </ul>
+        </p>
+
+        <h4>Service Area</h4>
+        <p>
+          <ul>
+            <li>Double click a location of choice on the map</li>
+            <li>A service area of 5, 10, 15 minutes will be generated</li>
+            <li> You can also clear the Service area by clicking on the <b>Clear Service Area button</b></li>
+          </ul>
+        </p>
     </div>
 </div>
 

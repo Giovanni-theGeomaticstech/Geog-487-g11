@@ -50,7 +50,20 @@ body, html {
 
 .items {
     position: relative;
-    top:30%;
+    top:25%;
+}
+
+
+.textinfo{
+    font-size: 18px;
+}
+
+/*For the text in the Class boxes*/
+
+.textheaders{
+    font-size: 20px;
+    font-weight: 600;
+    color: whitesmoke;
 }
 
 /* footer CLASS */

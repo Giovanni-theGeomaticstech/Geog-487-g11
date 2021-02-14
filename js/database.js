@@ -21,7 +21,7 @@ function addfeatureID(user_type, feature_id, type=null){
     let db_location_feature = user_type + "/" + type
     let featureRef = firebase.database().ref(db_location_feature)
     let featureInfo = featureRef.push(feature_id);
-    console.log("addFeatureID")
+    // console.log("addFeatureID")
 
 }
 
@@ -36,7 +36,7 @@ export function addFeature(user_type, feature, type=null){
 
     // As we add a feature we add its contents
     addfeatureID(user_type, feature.attributes["ObjectID"], type)
-    console.log("addFeatures")
+    // console.log("addFeatures")
 }
 
 export function loadfeatureIDs(user_type){
@@ -52,7 +52,7 @@ export function loadfeatureIDs(user_type){
             return data.val()
         });
     }
-    console.log("loadFeaturesIds")
+    // console.log("loadFeaturesIds")
 
     return featureIDs
 }
@@ -85,7 +85,7 @@ export function loadFeatures(user_type){
             return data.val()
         });
     }
-    console.log("loadFeatures")
+    // console.log("loadFeatures")
 
     return features
 }
@@ -93,9 +93,8 @@ export function loadFeatures(user_type){
 export function updateFeature(user_type, feature, feature_type, objectKey){
     let db_location_feature = user_type + "/" + feature_type
     let ref = firebase.database().ref(db_location_feature)
-    console.log("Here info")
-    console.log("updateFeature")
-    console.log(feature)
+    // console.log("updateFeature")
+    // console.log(feature)
 
     /* GIO NOTES
     Gio: Add a last updated field
@@ -111,33 +110,6 @@ export function deleteDbFeature(user_type, feature_type, objectKey){
     let ref = firebase.database().ref(db_location_feature)
     ref.child(objectKey).remove(); // remove specific key
 
-    console.log("deleteFeatures")
+    // console.log("deleteFeatures")
 
 }
-
-// var rootRef = firebase.database().ref();
-// rootRef.once("value")
-//   .then(function(snapshot) {
-//     var key = snapshot.key; // null
-//     var childKey = snapshot.child("users/ada").key; // "ada"
-//   });
-
-// function saveMessage(fname,lname,dob,last_grade,grade,email,phone,subject,notes,style_learn){
-
-//     var newMessageRef = messagesRef.push();
-//     //Now here I am creating an object to store in this collection
-//     newMessageRef.set({
-//         first_name:fname,
-//         last_name: lname,
-//         age: dob,
-//         last_grade: last_grade,
-//         grade: grade,
-//         email:email,
-//         phone_no: phone,
-//         availability:status,
-//         courses:subject,
-//         notes:notes,
-//         learn_style:style_learn
-//     });
-
-// }

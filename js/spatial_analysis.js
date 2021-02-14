@@ -75,12 +75,10 @@ export function pointsWithinPolygon(points, polygonFeatureCollection){
         servicePoints[currentFeature.properties.Name] = turf.pointsWithinPolygon(points, currentFeature)
     })
     // Here we get the attribute information
-    console.log(servicePoints)
 
     for (let name in servicePoints){
         let information = []
         turf.featureEach(servicePoints[name], function(currentFeature, featureIndex){
-            console.log(currentFeature)
             let featureName = `<b>Name:</b><p>${currentFeature.properties.Name}</p>`
             let featureId = `<b>ID:</b><p>${currentFeature.properties.uuid}</p>`
             let featureDescription = `<b>Description:</b><p>${currentFeature.properties.Description}</p>`

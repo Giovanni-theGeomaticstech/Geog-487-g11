@@ -12,6 +12,9 @@ import { uuid4 } from "../../../js/uuid4.js" // Unique IDs
 
 import { calcNearestPoint, pointsWithinPolygon } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
 
+import { configureKey } from "../../../js/apikeys.js" // importing our spatial analysis functions
+
+
 // close to achieve cdn node
 // require("")
 // require('dotenv').config()
@@ -91,8 +94,14 @@ require([
         // SETTING UP OUR MAP LAYER
         // All basemaps
         // Change out
-        const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
-        esriConfig.apiKey = apiKey
+      
+
+      let apiData = configureKey()
+        
+      apiData.then(function(apiKey){
+            esriConfig.apiKey = apiKey
+      
+        
         
         var map = new Map({
             basemap: "arcgis-imagery",
@@ -193,45 +202,6 @@ require([
       //////////////////////////////////////////////////////////////
 
  
-      // Listen to the click event on the map view.
-      //https://www.esri.com/arcgis-blog/products/js-api-arcgis/mapping/find-graphics-under-a-mouse-click-with-the-arcgis-api-for-javascript/
-      
-   
-      // view.on("click", function(event) {
-      //       console.log(graphicslayer.graphics.items[0].geometry.type)
-      //       console.log
-      //       // console.log("click event: ", event.mapPoint);
-      //       // console.log(event.mapPoint.type)
-      //       // alert(event.mapPoint.x)
-      // });
-
-
-      ////////////////////////////////////////////////////////////////////////
-      // Using the Sketch widget
-      // const sketch = new Sketch({
-      //     layer: graphicslayer,
-      //     view: view,
-      //     // graphic will be selected as soon as it is created
-      //     creationMode: "update"
-      //   });
-
-      // view.ui.add(sketch, "bottom-left");
-
-      // // We can either use this as the editor tag
-      // sketch.on("create", function(event) {
-      //       // check if the create event's state has changed to complete indicating
-      //       // the graphic create operation is completed.
-      //       if (event.state === "complete") {
-      //         // remove the graphic from the layer. Sketch adds
-      //         // the completed graphic to the layer by default.
-      //       //   graphicslayer.remove(event.graphic);
-      //             console.log(event.graphic.geometry.type)
-          
-      //         // use the graphic.geometry to query features that intersect it
-      //       //   selectFeatures(event.graphic.geometry);
-      //       }
-      // })
-
       ///////////////////////////////////////////////////////////////////
       // Feature Layer
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
@@ -320,29 +290,7 @@ require([
             //layerInfos: if we do not want people to edit these layers specifically
             // layerInfos: [editConfigPoliceLayer]
       });
-     // Add widget to the view
-//      view.ui.add(editor, "top-right"); // We would use this if we wanted to have this directly on our map layer
-
-      // Just like with Sketch widget we listened for the create maybe we can do similar stuff with the Editor
-      // We look on Methods
-      
-//      console.log(editor.hasEventListener("create"))
-      // view.popup.watch("visible", function(event){
-            // console.log(view.popup)
-            // console.log(view.popup.features)
-            // console.log("here")
-            // we can move this from here now
-            // if (editor.activeWorkflow != null){
-            //       console.log(editor.activeWorkflow.data.edits) // Do not pass this
-            //       console.log(editor.activeWorkflow.data.edits.attributesModified)
-            //       console.log(editor.activeWorkflow.data.edits.geometryModified)
-            //       console.log(editor.activeWorkflow.data.edits.feature.toJSON()) // NOW THIS WORKS [geometry, attributes, symbol, popupTemplate]
-            //       console.log(editor.activeWorkflow.data.edits._baselineGeometryJSON)
-            //       console.log(editor.activeWorkflow.data.edits._baselineAttributesJSON)
-            //       console.log(editor.activeWorkflow.data.edits.updatingHandles)
-            //       console.log(editor.activeWorkflow.data.edits.modified)
-            // }           
-      // })
+     
 
       /////////////////////////////////////////////////////////////////
 
@@ -520,8 +468,8 @@ require([
                         // Note that in the db both Object ID and UUID have the same values
 
                         feature_info = checkFeatureType(feature_info)
-                        console.log(info_update)
-                        console.log(feature_info)
+                        // console.log(info_update)
+                        // console.log(feature_info)
                         
                         // Updating DB
                         updateExistingFeature("residence", feature_id, feature_info, feature_info.geometry["type"])
@@ -564,20 +512,19 @@ require([
                         // None Editor widget data
 
                         if (feature_info.attributes){
-                              console.log("Getting UUID")
+                              // console.log("Getting UUID")
                               feature_id = feature_info.attributes["uuid"] // Use the uuid instead
                         }
                         if (feature_id){ 
-                              console.log(feature_id)
+                              // console.log(feature_id)
                               // Deleting from DB
-                              console.log(info_update)
+                              // console.log(info_update)
                               deleteClientFeatureLayer(feature_info.attributes["Type"], feature_info)
                               deleteFeatureObject("residence", feature_info.attributes["Type"] + "_ids", feature_id)
                         }
                         
                         break
             }
-            // console.log(feature_id)
 
       }
 
@@ -736,7 +683,7 @@ require([
             });
 
             routeTask.solve(routeParams).then(function(data) { // Here we solve the Route with Route Task
-                  console.log(data)
+                  // console.log(data)
                   data.routeResults.forEach(function(result) {
                         result.route.symbol = {
                               color: "#FCB61E",
@@ -774,7 +721,7 @@ require([
                   }
             }).catch(function(error){ // Catch errors
                   console.log(error);
-                  console.log("Error with creating route");
+                  alert("Error with creating route");
             }) 
       }
             
@@ -789,7 +736,7 @@ require([
                   data = JSON.parse(data) // parse the data to make it JavaScript object
                   // var center = turf.center(data);
                   // console.log(center)
-                  console.log(data)
+                  // console.log(data)
                   return data
              })
             return featureCollection
@@ -839,10 +786,10 @@ require([
             
             let curr_position = [position.coords.longitude, position.coords.latitude]
             
-            // startCoords = curr_position // Use this for GPS coordinates
+            startCoords = curr_position // Use this for GPS coordinates
             // Note it works via tracker and by current location
-            startCoords = [-79.21996483220589, 45.31764832102381] // Here I use test coordinates
-      
+            // startCoords = [-79.21996483220589, 45.31764832102381] // Here I use test coordinates
+            
             let featureCollects = getGeoJsonFromFile() // Note this is a promise object
             
             featureCollects.then(function(featureCollection){
@@ -851,7 +798,6 @@ require([
                   
                   // Rest of code here
                   let startPointMarker, endPointMarker
-                  console.log(view.graphics.length)
                   if (view.graphics.length >= 2){ // if we already have the start coords and endcoords added
                         view.graphics.removeAll();
                   }
@@ -891,8 +837,8 @@ require([
                   } 
             })
             
-            console.log("Latitude: " + position.coords.latitude +
-            "<br>Longitude: " + position.coords.longitude)
+            // console.log("Latitude: " + position.coords.latitude +
+            // "<br>Longitude: " + position.coords.longitude)
       }
 
       // Here make geolocation functions to be used in the application for the analysis
@@ -961,7 +907,7 @@ require([
                   return serviceAreaPolygons // Here we return the service area polygons
                 }
               }, function(error){
-                console.log(error);
+            //     console.log(error);
                 alert("Error in Service Area Calculation")
               });
     
@@ -1017,7 +963,6 @@ require([
                         }
                         // Changing it to Turf FeatureCollection
                         let featureCollection = turf.featureCollection(features)
-                        console.log(featureCollection)
                         serviceAreaData(featureCollection)
                   }) // Closing for ServiceAreaFeatures
                   
@@ -1033,4 +978,5 @@ require([
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   }
-);
+)
+})// Close out API KEY

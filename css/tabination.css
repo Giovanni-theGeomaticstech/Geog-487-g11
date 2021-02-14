@@ -4,7 +4,7 @@
   /* Style tab links */
  
   .toggle_container{ /* Change the container height*/
-      height: 30%;
+      height: 35%;
       border: 1px solid black;
       position: relative;
       top: -30%;
@@ -51,7 +51,7 @@
     text-align: left;
     overflow-y:auto;
   }
-  #NotAvailable {
+  #Instructions {
     background-color: whitesmoke;
     text-align: left;
     overflow-y:auto;}

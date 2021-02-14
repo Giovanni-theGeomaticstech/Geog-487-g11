@@ -79,7 +79,7 @@ function firebaseOjectKey(user_type, type, indexID){
       }
       ++i
     }
-    console.log(objectKey)
+    // console.log(objectKey)
     return objectKey
   })
 }
@@ -101,7 +101,7 @@ function firebaseOjectKey(user_type, type, indexID){
 export function deleteFeatureObject(user_type, type, featureID){
 
   if (type.search("_ids") < 0){
-    console.log("You need to pass in ID data")
+    // console.log("You need to pass in ID data")
     return
   }
 
@@ -116,14 +116,14 @@ export function deleteFeatureObject(user_type, type, featureID){
       // Delete ID
       let objectKeyPromise_id = firebaseOjectKey(user_type, type, objectIndex) // We get the Object Key in db
       objectKeyPromise_id.then(function(objectKey){
-        console.log("Key ID " + objectKey)
+        // console.log("Key ID " + objectKey)
         deleteDbFeature(user_type, type, objectKey) // We delete from DB
       })
 
       // Delete Feature
       let objectKeyPromise_feature = firebaseOjectKey(user_type, type_feature, objectIndex) // We get the Object Key in db
       objectKeyPromise_feature.then(function(objectKeyFeature){
-        console.log("Key ID Feature" + objectKeyFeature)
+        // console.log("Key ID Feature" + objectKeyFeature)
         deleteDbFeature(user_type, type_feature , objectKeyFeature) // We delete from DB
       })
     }
@@ -143,8 +143,8 @@ export function updateExistingFeature(user_type, featureID, feature, type_featur
 
   return featureIDsArrPromise.then(function(featureIDsArr){
     // We check if the feature ID is the Feature ID list
-    console.log(featureID)
-    console.log(featureIDsArr)
+    // console.log(featureID)
+    // console.log(featureIDsArr)
     if (featureIDsArr.includes(featureID)){
       let objectIndex = featureIDsArr.indexOf(featureID)
       
@@ -158,13 +158,13 @@ export function updateExistingFeature(user_type, featureID, feature, type_featur
       // Update Feature
       let objectKeyPromise_feature = firebaseOjectKey(user_type, type_feature, objectIndex) // We get the Object Key in db
       objectKeyPromise_feature.then(function(objectKeyFeature){
-        console.log("Key ID Feature" + objectKeyFeature)
+        // console.log("Key ID Feature" + objectKeyFeature)
         updateFeature(user_type, feature, type_feature , objectKeyFeature) // We delete from DB
       })
-      console.log("Feature Updated")
+      // console.log("Feature Updated")
       return "Feature Updated"
     }
-    console.log("Feature Does not Exists")
+    // console.log("Feature Does not Exists")
     return "Feature Does not Exists"
 })
 }
@@ -194,7 +194,7 @@ export function listFeatures(user_type, type){
     for (let feature in data){
       listOfFeatures.push(data[feature])
     }
-    console.log(listOfFeatures)
+    // console.log(listOfFeatures)
     return listOfFeatures
   })
 }
@@ -204,13 +204,13 @@ export function listFeatures(user_type, type){
 // The IDS are the FireBase Database IDS
 export function listFeatureIDs(user_type, type){
   let featureIDJson = loadfeatureIDs(user_type)
-  console.log(type)
+  // console.log(type)
   return featureIDJson[type].then(function(data){
     let listOfFeatureIDs = []
     for (let featureID in data){
       listOfFeatureIDs.push(data[featureID])
     }
-    console.log(listOfFeatureIDs)
+    // console.log(listOfFeatureIDs)
     return listOfFeatureIDs
   })
 }
@@ -221,7 +221,7 @@ export function listFeatureIDs(user_type, type){
 
 export function addNewFeature(user_type, feature, type){
   // Basically we want to call that Add Feature function in our connection .js
-  console.log("add feature")
+  // console.log("add feature")
   
   // We can use to delete to remove an object property
   // delete feature.popupTemplate
@@ -231,7 +231,7 @@ export function addNewFeature(user_type, feature, type){
     return addFeature(user_type, feature, type)
   }
   else{
-    console.log("There is no data in the feature")
+    // console.log("There is no data in the feature")
   }
 }
 
