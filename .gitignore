@@ -104,6 +104,7 @@ celerybeat.pid
 # Environments
 .env
 test.env
+firebase.env
 .venv
 env/
 venv/

@@ -1,5 +1,5 @@
 // Data Written: January 25, 2021
-// Last Updated: February 1, 2021
+// Last Updated: February 14, 2021
 // This file will contain Javascript Code
 // The Code will focus anything map related to the ArcGIS API for JAVASCRIPT
 // This file will focus on the residences

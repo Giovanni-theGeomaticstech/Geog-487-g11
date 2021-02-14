@@ -1,5 +1,5 @@
 // Date written: January 25, 2021
-// Last update: February 5, 2021
+// Last update: February 14, 2021
 // File Purpose: Set up Firebase connection
 
 // This file serves as the general firebase connection
@@ -15,42 +15,38 @@
 // firebase login
 // firebase init
 
-//// Browserify Setup
-// var firebase = require('firebase/app');
-// require('firebase/auth');
-// require('firebase/database');
-//Consider doing this later
-
-// This is going to tell the server to call anything that is .env 
-// https://www.youtube.com/watch?v=17UVejOw3zA
 
 
-// require('dotenv').config( {
-//       path: path.join(__dirname, '.env')
-//   });
-// console.log(process.env)
+import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
-// Note this File is the connection path for the DB
-
-
-
-const firebaseConfig = {
-  apiKey: "AIzaSyASl3akZm0lj3Rh_hLhMydxhOs52NONH7E",
-  authDomain: "huntsville-proj.firebaseapp.com",
-  databaseURL: "https://huntsville-proj-default-rtdb.firebaseio.com",
-  projectId: "huntsville-proj",
-  storageBucket: "huntsville-proj.appspot.com",
-  messagingSenderId: "332679935283",
-  appId: "1:332679935283:web:a7ba6b4deea0c97f317a46",
-  measurementId: "G-S6VBDD8DQ4"
-};
+// function firebaseConfigKey(){
+//   let file = "../../../firebase.env"
+//   let data = fetch (file).then(x => x.text()).then(function(data){
+//         let data_cleaned = data.split("\n")
+//         let firebaseConfig = {}
+//         for (let i =0 ; i < data_cleaned.length; i++){
+//           let info = data_cleaned[i].split("=")
+//           firebaseConfig[info[0]] = info[1]
+//         }
+//         console.log(firebaseConfig)
+//         return firebaseConfig
+//    })
+//   return data
+// }
+// let firebaseInfo = firebaseConfigKey()
 
 
+
+
+
+
+firebaseInfo.then(function(firebaseConfig){
+  
+})
   // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 //button id =search_btn_url
-import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
 
 
