@@ -34,6 +34,16 @@
 
 
 
+const firebaseConfig = {
+  apiKey: "AIzaSyASl3akZm0lj3Rh_hLhMydxhOs52NONH7E",
+  authDomain: "huntsville-proj.firebaseapp.com",
+  databaseURL: "https://huntsville-proj-default-rtdb.firebaseio.com",
+  projectId: "huntsville-proj",
+  storageBucket: "huntsville-proj.appspot.com",
+  messagingSenderId: "332679935283",
+  appId: "1:332679935283:web:a7ba6b4deea0c97f317a46",
+  measurementId: "G-S6VBDD8DQ4"
+};
 
 
   // Initialize Firebase
