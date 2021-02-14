@@ -105,48 +105,42 @@
     </div>
   </div>
 
-  <!-- <div class="layerContainer"></div> -->
+  <div class="layerContainer">
     <div id="editWidget" class="aligned">
 
       <div id = "search_form" class="example" style="margin:auto;max-width:300px">
           <input id="url_info" type="text" placeholder="Search Layers Online..." name="search2">
           <button id="search_btn_url"><i class="fa fa-search"></i></button>
       </div>
+      <div class="form-popup" id="myForm">
+        <div class="form-container">
+          <h2>Edit Metadata Info</h2>
+    
+      
+          <label for="input_name"><b>Name</b></label>
+          <input id="input_name" type="text" placeholder="The feature name" name="input_name" required>
+      
+          <!-- <label for="input_type"><b>Type</b></label>
+          <input id="input_type" type="text" placeholder="Feature type" name="input_type"> -->
+      
+      
+          <label for="input_date"><b>Date</b></label>
+          <input id="input_date" type="date" placeholder="Current date" name="input_date" required></br></br>
+      
+          <!-- <label for="input_uuid"><b>UUID</b></label>
+          <input id="input_uuid" type="text" placeholder="" name="input_uuid" required> -->
+      
+          <label for="input_description"><b>Description</b></label>
+          <input id="input_description" type="text" placeholder="Contribution Description..." name="input_description" required>
+      
+          <button id="addBtn" class="btn cancel">Update Information</button>
+          <!-- <button type="button" id ="closeBtn" class="btn cancel">Close</button> -->
+        </div>
+      </div>
     </div>
     <!-- Adding our map to the page-->
 
     <div id = "maparea" class="aligned"><div id="map"></div></div>
-  <!-- </div> -->
-
-<!-- <div id = "toolbar"></div> -->
-
-  <!-- Adding the Popup Feature-->
-
-  <!-- <button id="openBtn" class="open-button">Open Form</button> -->
-  <div class="form-popup" id="myForm">
-    <div class="form-container">
-      <h2>Edit Metadata Info</h2>
-
-  
-      <label for="input_name"><b>Name</b></label>
-      <input id="input_name" type="text" placeholder="The feature name" name="input_name" required>
-  
-      <!-- <label for="input_type"><b>Type</b></label>
-      <input id="input_type" type="text" placeholder="Feature type" name="input_type"> -->
-  
-  
-      <label for="input_date"><b>Date</b></label>
-      <input id="input_date" type="date" placeholder="Current date" name="input_date" required></br></br>
-  
-      <!-- <label for="input_uuid"><b>UUID</b></label>
-      <input id="input_uuid" type="text" placeholder="" name="input_uuid" required> -->
-  
-      <label for="input_description"><b>Description</b></label>
-      <input id="input_description" type="text" placeholder="Contribution Description..." name="input_description" required>
-  
-      <button id="addBtn" class="btn cancel">Update Information</button>
-      <!-- <button type="button" id ="closeBtn" class="btn cancel">Close</button> -->
-    </div>
   </div>
 
   <!--The tab Containers check tabination.css-->

@@ -91,7 +91,6 @@ require([
         // SETTING UP OUR MAP LAYER
         // All basemaps
         // Change out
-        const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
         esriConfig.apiKey = apiKey
         
         var map = new Map({

@@ -7,7 +7,6 @@ import { point_stylings } from "../../../js/basis.js" // Importing our fields sc
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // Adding in Map to application
-const apiKey = "AAPK97141046da3e451bbae39017f1f1105b_EGKfxJiq-gy67CMrDr-il8H9t4-5sly02yt-vTCAaeJm5ZEno5_tfub3a-_TB_T"
 
 var map = L.map('map', {
 	editable: true,
@@ -179,7 +178,7 @@ function metaFormatHtml(attributes){
 }
 ///////////////////////////////////////////////////////////////////
 
-function addBtnFunc(layer){
+function addBtnFunc(layer, existingInDB=null){
 	let unique_id;
 	let type;
 
@@ -199,18 +198,35 @@ function addBtnFunc(layer){
 	else{ // Probably never called because we create Unique ID when the Feature is Made
 		unique_id = uuid4()
 	}
+
 	
-
-    addAttributeData = {
-        "Name": name.value,
-        "Type": type,
-        "uuid": unique_id, // Probably automatically crea
-        "ObjectID": unique_id ,
-        "Data_added": date_added.value,
-        "Description": description.value,
-    }
-
+	
 	let layerJson = layer.toGeoJSON()
+
+	if (existingInDB){
+		type = layerJson.geometry["type"].toLowerCase()
+		unique_id = layerJson.attributes.uuid
+		addAttributeData = {
+			"Name": name.value,
+			"Type": type,
+			"uuid": layerJson.attributes.uuid, // Probably automatically crea
+			"ObjectID": layerJson.attributes.ObjectID ,
+			"Data_added": date_added.value,
+			"Description": description.value,
+		}
+		
+	}else{
+		addAttributeData = {
+			"Name": name.value,
+			"Type": type,
+			"uuid": unique_id, // Probably automatically crea
+			"ObjectID": unique_id ,
+			"Data_added": date_added.value,
+			"Description": description.value,
+		}
+
+	}
+	
 
 	layer.attributes = addAttributeData // We add the corresponding metadata
 	layerJson.attributes = addAttributeData // We add the information to the JSON
@@ -248,8 +264,7 @@ map.on("mouseover", function(){
 	// 	console.log('here')
 	// })
 	drawnItems.eachLayer(function(layer){
-		layer.on('mouseover', function(feature){
-			
+		layer.on('mouseover', function(feature){			
 			metaInfoPopup() // The Form to add information
 			// Here we add the add button functionality to take the layer info
 			addInfoBtn.onclick = function(){
@@ -569,6 +584,15 @@ function loadDBFeatures(){
 							  }})
 						
 						}
+						// Activate the POPUP FORM FOR VGI FEATURES
+						feature.on("click", function(feature)  {
+							console.log(feature.layer)
+							metaInfoPopup() // The Form to add information
+							// Here we add the add button functionality to take the layer info
+							addInfoBtn.onclick = function(){
+								addBtnFunc(feature.layer, "existing")
+							}	
+						})
 						feature.addTo(map)
 						feature.bindPopup(popUp)
 					}
@@ -827,16 +851,17 @@ function serviceArea(){
 				  fillOpacity: 0.5,
 				  weight: 1
 				}
+
 				if(feature.properties.FromBreak === 0) {
 					// feature.bindPopup("5 minutes service area")
-				  style.color = 'hsl(210, 80%, 40%)';
+				  style.color = '#AD1B10';
 				  feature.properties.popupTemplate = "<h1>Hello</h1>"
 				} else if(feature.properties.FromBreak === 5) {
 					// feature.bindPopup("10 minutes service area")
-				  style.color = "hsl(210, 80%, 60%)";
+				  style.color = "#DE463E";
 				} else {
 					// feature.bindPopup("15 minutes service area")
-				  style.color = "hsl(210, 80%, 80%)";
+				  style.color = "#E38984";
 				}
 				return style;
 			  },

@@ -23,8 +23,8 @@ html, body{
 #maparea{
   position: relative;
   /* float:right; */
-  height: 70%;
-  width: 49%;
+  height: 60%;
+  width: 65%;
   /* border: 1px solid red; */
 }
 #map {
@@ -37,8 +37,9 @@ html, body{
 #editWidget{
   float: left;
   position: relative;
-  height: 70%;
+  height: 60%;
   width: 25%;
+  overflow-y: auto;
 }
 
 /* Get elements to be in the same block */
@@ -53,7 +54,7 @@ html, body{
   height: 35%;
   border: 1px solid black;
   position: relative;
-  top: -0% !important;
+  top: -40% !important;
 }
 
 
