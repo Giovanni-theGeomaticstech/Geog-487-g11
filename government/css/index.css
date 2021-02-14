@@ -1,0 +1,77 @@
+/* Date written: January 25, 2021*/
+/* This file will focus on the residence styling */
+
+
+/* This is the for the initial page styling */
+
+html, body{
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+
+
+  /*************************************************************/
+
+  /* Working on the Map and editor widget styling*/
+
+  .layerContainer {
+    position: relative;
+    /*left: 30%; /* Pushes value to right */
+    top: 0; /* Pushes value to right */
+
+    /*text-align: center;
+    background-color: whitesmoke;*/
+    /* border: 2px solid black;   */
+
+    border-top: 4px solid #93DB70;
+    width: 100%;
+    height: 100%;
+}
+
+
+  
+  /* A wrapper for the map */
+  #maparea{
+    position: relative;
+    /* float:right; */
+    height: 70%;
+    width: 49%;
+    /* border: 1px solid red; */
+  }
+  #viewDiv {
+    /* display: inline-block; */
+    height: 100%;
+    width: 100%;
+  }
+
+  #editWidget{
+    float: left;
+    position: relative;
+    height: 70%;
+    width: 25%;
+    overflow-y:auto;
+  }
+
+  /* Get elements to be in the same block */
+  .aligned{
+    display:inline-block;
+    padding: 2px;
+  }
+
+  /* Turn Layers on and off */
+  #toggle_layers{
+    height: 70%;
+    width: 25%;
+  }
+
+
+  /*************************************************************/
+
+
+  
+
+  /*************************************************************/
+
+ 

@@ -4,12 +4,72 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Landing Page</title>
+    <!--Navbar css content for features-->
+    <link rel="stylesheet" href="../../css/nav.css">
+
+     <!-- W3 Schools CSS-->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        .box-style{
+            background-color: #696969;
+        }
+        .box-style p{
+            color: ghostwhite;
+        }
+
+        .card-effect{
+            opacity: 0.6;
+            transition: 1.2s;
+        }
+
+        .card-effect:hover{
+            opacity: 1;
+        }
+
+        a{
+            text-decoration: none;
+        }
+    </style>
+
+
 </head>
 <body>
-    <ul>
-        <li><a href="esri/index.html">Esri App</a></li>
-        <li><a href="leaflet/index.html">Leaflet  App</a></li>
-    </ul>
+
+    <!--Nav BAR-->
+    <div class="topnav">
+        <a class="active" href="../../index.html"><b>3GN Tech - Home</b></a>
+        <div class="topnav-right">
+            <a href="https://www.huntsville.ca/en/index.aspx">Huntsville - Home</a>
+            <a href="https://www.huntsville.ca/Modules/News/Search.aspx">News</a>
+            <a href="https://www.huntsville.ca/Modules/contact/search.aspx?s=fp8cBTjOJaCUAUEUxjc3JQeQuAleQuAl">Contact</a>
+            <a href="https://www.huntsville.ca/en/roads-sidewalks-and-transit/roads-sidewalks-and-transit.aspx">Transit</a> 
+        </div>
+    </div>
+
+    <!-- Card Information Container-->
+    <div class="w3-container w3-center">
+    </br>
+        <h2><b>Applications</b></h2>
+        </br>
+        </br>
+        </br>
+        <a href="esri/index.html">
+            <div class="w3-card-4" style="width:40%; display: inline-block;">
+                <img class = "card-effect" src="map_images/esri_map.JPG" alt="Alps" style="width:100%">
+                <div class="w3-container w3-center box-style">
+                    <p>Esri App</p>
+            </div>
+        </div></a>
+
+        <a href="leaflet/index.html">
+            <div class="w3-card-4" style="width:40%; display: inline-block;">
+                <img class = "card-effect" src="map_images/leaflet_map.JPG" alt="Alps" style="width:100%">
+                <div class="w3-container w3-center box-style">
+                    <p>Leaflet  App</p>
+                </div>
+            </div>
+        </a>
+      </div>
 </body>
 </html>

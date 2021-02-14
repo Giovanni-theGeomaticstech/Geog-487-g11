@@ -1,0 +1,76 @@
+
+html, body{
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+  
+.layerContainer {
+  position: relative;
+  /*left: 30%; /* Pushes value to right */
+  top: 0; /* Pushes value to right */
+
+  /*text-align: center;
+  background-color: whitesmoke;*/
+  /* border: 2px solid black;   */
+
+  border-top: 4px solid #93DB70;
+  width: 100%;
+  height: 100%;
+}
+
+/* A wrapper for the map */
+#maparea{
+  position: relative;
+  /* float:right; */
+  height: 60%;
+  width: 75%;
+  /* border: 1px solid red; */
+}
+#map {
+  /* display: inline-block; */
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+#editWidget{
+  float: left;
+  position: relative;
+  height: 60%;
+  width: 25%;
+  overflow-y: auto;
+}
+
+/* Get elements to be in the same block */
+.aligned{
+  display:inline-block;
+  padding: 2px;
+}
+
+
+/* Overwriting Tab Container*/
+.toggle_container{ /* Change the container height*/
+  height: 35%;
+  border: 1px solid black;
+  position: relative;
+  top: -40% !important;
+}
+
+
+/* Directions Widget */
+
+/*Code to create the directions widget */
+#directions {
+  /* position: absolute; */
+  /* z-index: 1000; */
+  width: 50%;
+  /* max-height: 50%; */
+  /* right: 20px;*/
+  /* top: 20px; */
+  /* overflow-y: auto; /*Show a scrollbar if needed */
+  font-family: Arial, Helvetica, Verdana;
+  line-height: 1.5;
+  /* font-size: 14px; */
+  padding: 5px;
+}

@@ -781,104 +781,104 @@ apiData.then(function(apiKey){
 
 
 	// Layer for Service Area
-	// const serviceLayerGroup = L.layerGroup().addTo(map)
+	const serviceLayerGroup = L.layerGroup().addTo(map)
 
-	// // Layer for points of service areas 
-	// let serviceStartPoints = L.layerGroup().addTo(map);
+	// Layer for points of service areas 
+	let serviceStartPoints = L.layerGroup().addTo(map);
 
 
-	// ///////////////////////////////////////////////////////////////////////////////////////
-	// // Gathers Data from points in the Service area generated through VGI
-	// function serviceAreaData(serviceFeatureCollection){
-	// 	var serviceAreaInfoDump = document.getElementById("servicedump")
-	// 	serviceAreaInfoDump.innerHTML = ""
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Gathers Data from points in the Service area generated through VGI
+	function serviceAreaData(serviceFeatureCollection){
+		var serviceAreaInfoDump = document.getElementById("servicedump")
+		serviceAreaInfoDump.innerHTML = ""
 
-	// 	// Here We are going to add in points from the VGI
-	// 	let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
-	// 	vgiFeaturesPromise.then(function(featuresList){
-	// 		let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
+		// Here We are going to add in points from the VGI
+		let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
+		vgiFeaturesPromise.then(function(featuresList){
+			let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
 
-	// 		for (let serviceName in data){
-	// 			let serviceHeader = `<h4>${serviceName}</h4></br>`
-	// 			serviceAreaInfoDump.style.backgroundColor = "white"
-	// 			serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
+			for (let serviceName in data){
+				let serviceHeader = `<h4>${serviceName}</h4></br>`
+				serviceAreaInfoDump.style.backgroundColor = "white"
+				serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
 
-	// 			serviceAreaInfoDump.innerHTML += serviceHeader 
-	// 			for (let i = 0; i < data[serviceName].length; ++i){
-	// 				serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>"// That feature content
-	// 			}
-	// 		}
-	// 	})
-	// }
-	// ///////////////////////////////////////////////////////////////////////////////////////
+				serviceAreaInfoDump.innerHTML += serviceHeader 
+				for (let i = 0; i < data[serviceName].length; ++i){
+					serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>"// That feature content
+				}
+			}
+		})
+	}
+	///////////////////////////////////////////////////////////////////////////////////////
 
-	// function serviceArea(){
-	// 	const authentication = new arcgisRest.ApiKey({
-	// 		key: apiKey
-	// 	});
+	function serviceArea(){
+		const authentication = new arcgisRest.ApiKey({
+			key: apiKey
+		});
 	
-	// 	// When the map is clicked, call the service area REST service with the
-	// 	// clicked point and display the results.
-	// 	map.on("dblclick", (curr_location) => {
+		// When the map is clicked, call the service area REST service with the
+		// clicked point and display the results.
+		map.on("dblclick", (curr_location) => {
 
-	// 		// Clear the previous results
-	// 		serviceStartPoints.clearLayers();
-	// 		serviceLayerGroup.clearLayers();
+			// Clear the previous results
+			serviceStartPoints.clearLayers();
+			serviceLayerGroup.clearLayers();
 	
-	// 		// Add the source point
+			// Add the source point
 			
-	// 		L.marker(curr_location.latlng, {icon: animatedIcon}).addTo(serviceStartPoints);
+			L.marker(curr_location.latlng, {icon: animatedIcon}).addTo(serviceStartPoints);
 			
-	// 		// Make the API request
-	// 		arcgisRest
-	// 		.serviceArea({
-	// 			endpoint: "https://route-api.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea",
-	// 			authentication,
-	// 			facilities: [[curr_location.latlng.lng, curr_location.latlng.lat]]
-	// 		})
-	// 		.then((response) => { // Shorthand JS for function calls
-	// 			// Show the result route on the map.
-	// 			let layers = L.geoJSON(response.saPolygons.geoJson, {
-	// 			style: (feature) => { // Short Hand JS for Function calls
-	// 				const style = {
-	// 				fillOpacity: 0.5,
-	// 				weight: 1
-	// 				}
+			// Make the API request
+			arcgisRest
+			.serviceArea({
+				endpoint: "https://route-api.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea",
+				authentication,
+				facilities: [[curr_location.latlng.lng, curr_location.latlng.lat]]
+			})
+			.then((response) => { // Shorthand JS for function calls
+				// Show the result route on the map.
+				let layers = L.geoJSON(response.saPolygons.geoJson, {
+				style: (feature) => { // Short Hand JS for Function calls
+					const style = {
+					fillOpacity: 0.5,
+					weight: 1
+					}
 
-	// 				if(feature.properties.FromBreak === 0) {
-	// 					// feature.bindPopup("5 minutes service area")
-	// 				style.color = '#AD1B10';
-	// 				feature.properties.popupTemplate = "<h1>Hello</h1>"
-	// 				} else if(feature.properties.FromBreak === 5) {
-	// 					// feature.bindPopup("10 minutes service area")
-	// 				style.color = "#DE463E";
-	// 				} else {
-	// 					// feature.bindPopup("15 minutes service area")
-	// 				style.color = "#E38984";
-	// 				}
-	// 				return style;
-	// 			},
-	// 			// https://stackoverflow.com/questions/14506989/leaflet-popup-with-additional-information-from-geojson
+					if(feature.properties.FromBreak === 0) {
+						// feature.bindPopup("5 minutes service area")
+					style.color = '#AD1B10';
+					feature.properties.popupTemplate = "<h1>Hello</h1>"
+					} else if(feature.properties.FromBreak === 5) {
+						// feature.bindPopup("10 minutes service area")
+					style.color = "#DE463E";
+					} else {
+						// feature.bindPopup("15 minutes service area")
+					style.color = "#E38984";
+					}
+					return style;
+				},
+				// https://stackoverflow.com/questions/14506989/leaflet-popup-with-additional-information-from-geojson
 
-	// 			onEachFeature: function (feature, layer) {
-	// 				layer.bindPopup(`<h3>Service Area-${feature.properties.Name} + minutes</h3>`);
-	// 			}
-	// 			}).addTo(serviceLayerGroup);
-	// 			let serviceAreaFeatureCollection = response.saPolygons.geoJson
-	// 			serviceAreaData(serviceAreaFeatureCollection)
+				onEachFeature: function (feature, layer) {
+					layer.bindPopup(`<h3>Service Area-${feature.properties.Name} + minutes</h3>`);
+				}
+				}).addTo(serviceLayerGroup);
+				let serviceAreaFeatureCollection = response.saPolygons.geoJson
+				serviceAreaData(serviceAreaFeatureCollection)
 
-	// 		})
-	// 		.catch((error) => {
-	// 			console.error(error);
-	// 			alert("There was a problem using the route service. See the console for details.");
-	// 		});
-	// 	});
-	// }
-	// serviceArea()
+			})
+			.catch((error) => {
+				console.error(error);
+				alert("There was a problem using the route service. See the console for details.");
+			});
+		});
+	}
+	serviceArea()
 
-	// let clearServiceAreaBtn = document.getElementById("clearService")
-	// clearServiceAreaBtn.onclick = function(){
-	// 	serviceStartPoints.clearLayers();
-	// 	serviceLayerGroup.clearLayers();
-	// }
+	let clearServiceAreaBtn = document.getElementById("clearService")
+	clearServiceAreaBtn.onclick = function(){
+		serviceStartPoints.clearLayers();
+		serviceLayerGroup.clearLayers();
+	}
 }) // CLOSE OUT API KEY

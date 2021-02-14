@@ -40,9 +40,9 @@ import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeatur
 
 
 
-firebaseInfo.then(function(firebaseConfig){
+// firebaseInfo.then(function(firebaseConfig){
   
-})
+// })
   // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
