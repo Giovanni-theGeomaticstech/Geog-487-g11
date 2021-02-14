@@ -738,11 +738,6 @@ require([
             routeTask.solve(routeParams).then(function(data) { // Here we solve the Route with Route Task
                   console.log(data)
                   data.routeResults.forEach(function(result) {
-                        // result.route.symbol ={
-                        //             type: "simple-line",
-                        //             color: "#FCB61E", // Orange
-                        //             width: 2.5
-                        // }
                         result.route.symbol = {
                               color: "#FCB61E",
                               width: 2.5,
@@ -767,11 +762,13 @@ require([
                   
 
                         // Show each direction
+                        let container = document.getElementById("RouteLocator")
                         directionFeatures.forEach(function(result,i){
-                              const direction_ele = document.createElement("li");
+                              const direction_ele = document.createElement("p");
                               direction_ele.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " miles)";
                               directions.appendChild(direction_ele);
                         })
+                        container.append(directions)
                         // view.ui.empty("top-right")
                         // view.ui.add(directions, "top-right")
                   }
@@ -835,7 +832,7 @@ require([
             // directionsWidget.id = "directions";
             
             let directionsWidget = document.getElementById("directions")
-            directionsWidget.innerHTML = "Starting Route Directions";
+            directionsWidget.innerHTML = "<h4>Route Directions</h4>";
             document.body.appendChild(directionsWidget);
       
             let startCoords, endCoords;
@@ -932,11 +929,14 @@ require([
             vgiFeaturesPromise.then(function(featuresList){
                   let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
 
+                  serviceAreaInfoDump.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+                  serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
+                  
                   for (let serviceName in data){
-                        let serviceHeader = `<h2>${serviceName}</h2>`
+                        let serviceHeader = `<h4>${serviceName}</h4></br>`
                         serviceAreaInfoDump.innerHTML += serviceHeader 
                         for (let i = 0; i < data[serviceName].length; ++i){
-                              serviceAreaInfoDump.innerHTML += data[serviceName][i] // That feature content
+                              serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>" // That feature content
                         }
                   }
             })
@@ -966,7 +966,7 @@ require([
               });
     
       }
-
+      
       // Create Service Area Params
       function createServiceAreaParams(locationGraphic, driveTimeCutoffs, outSpatialReference) {
 
@@ -1020,13 +1020,17 @@ require([
                         console.log(featureCollection)
                         serviceAreaData(featureCollection)
                   }) // Closing for ServiceAreaFeatures
+                  
             })
       }
-
       serviceArea()
 
+      let clearServiceAreaBtn = document.getElementById("clearService")
+      
+      clearServiceAreaBtn.onclick = function(){
+            view.graphics.removeAll()
+      }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
   }
 );

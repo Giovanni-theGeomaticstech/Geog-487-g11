@@ -1,6 +1,7 @@
 import { uuid4 } from "../../../js/uuid4.js"
 import { deleteFeatureObject, updateExistingFeature,  addNewFeature, listFeatures, listFeatureIDs, } from "../../../js/connection.js" // importing our database tools
 import { calcNearestPoint, pointsWithinPolygon } from "../../../js/spatial_analysis.js" // importing our spatial analysis functions
+import { point_stylings } from "../../../js/basis.js" // Importing our fields schema
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +16,7 @@ var map = L.map('map', {
 
 //   let layer = L.esri.basemapLayer('Topographic').addTo(map);
 // https://developers.arcgis.com/esri-leaflet/maps/change-the-basemap-layer/
-let layer = L.esri.Vector.vectorBasemapLayer("ArcGIS:Navigation",{
+let layer = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery",{
 	apiKey: apiKey // Adding the API Key to the map
 }).addTo(map);
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,18 +38,6 @@ L.control.locate().addTo(map);
 // Old Way of Search Bar
 // var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
 
-// L.esri.Geocoding.geosearch({
-// 	position:"topright",
-// 	providers: [
-// 	arcgisOnline,
-// 	L.esri.Geocoding.mapServiceProvider({
-// 		label: 'States and Counties',
-// 		url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
-// 		layers: [2, 3],
-// 		searchFields: ['NAME', 'STATE_NAME']
-// 	})
-// 	]
-// }).addTo(map);
 
 const searchControl = L.esri.Geocoding.geosearch({
 	position: "topright",
@@ -94,7 +83,7 @@ var LeafIcon = L.Icon.extend({
 
 // Use this to change the marker symbol
 var greenIcon = new LeafIcon({
-	iconUrl: 'https://image.freepik.com/free-icon/map-marker_318-49860.jpg'
+	iconUrl: '../image/location-tag-fixed.png'
 });
 
 // FeatureGroup might be similar to FeatureLayer in ArcGIS API for Javascript
@@ -538,13 +527,26 @@ function updateRoute(startCoords, endCoords, directionsWidget) {
 		console.log(response)
 		// Show the result route on the map.
 		routeLines.clearLayers();
-		L.geoJSON(response.routes.geoJson).addTo(routeLines);
+		var myStyle = {
+			"color": "#FCB61E",
+			"weight": 5,
+			"opacity": 0.65
+		};
+		L.geoJSON(response.routes.geoJson, {
+			style: myStyle
+		}).addTo(routeLines);
 		map.setView([startCoords[1], startCoords[0]], 16) // We want to move the map to start location
 
 
 		// Show the result text directions on the map.
-		const directionsHTML = response.directions[0].features.map((f) => f.attributes.text).join("<br/>");
-		directionsWidget.innerHTML = directionsHTML;
+		directionsWidget.innerHTML = "<h4>Route Directions</h4>";
+
+		const directionsHTML = response.directions[0].features.map((f) => `<p>${f.attributes.text}</p>`).join("<br/>");
+		directionsWidget.innerHTML += directionsHTML;
+		directionsWidget.style.backgroundColor = "white"
+		let container = document.getElementById("RouteLocator")
+		container.append(directionsWidget)
+
 		startCoords = null;
 		endCoords = null;
 	  })
@@ -571,6 +573,14 @@ function getGeoJsonFromFile(file=null){
 	 })
 	return featureCollection
 }
+
+//Animated Icon
+var animatedIcon = L.icon({
+	iconUrl: point_stylings.locator.url,		
+	iconSize:     [95, 95], // size of the icon
+	iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+	popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
   
 function showPosition(position) {
 	// ROUTING DIRECTIONS RELATED
@@ -601,11 +611,11 @@ function showPosition(position) {
 			startLayerGroup.clearLayers();
 			endLayerGroup.clearLayers();
 			routeLines.clearLayers();
-			startPointMarker = L.marker([startCoords[1], startCoords[0]]).addTo(startLayerGroup); // Adding the start coords to the map
+			startPointMarker = L.marker([startCoords[1], startCoords[0]], {icon: animatedIcon}).addTo(startLayerGroup); // Adding the start coords to the map
 		
 		}
 		if (endCoords){
-			endPointMarker = L.marker([endCoords[1], endCoords[0]]).addTo(endLayerGroup); // Adding the end coords to map
+			endPointMarker = L.marker([endCoords[1], endCoords[0]], {icon: animatedIcon}).addTo(endLayerGroup); // Adding the end coords to map
 		}
 		if (startCoords && endCoords) {
 			startPointMarker.bindPopup("The Start Point")
@@ -658,10 +668,13 @@ function serviceAreaData(serviceFeatureCollection){
 		let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
 
 		for (let serviceName in data){
-			let serviceHeader = `<h2>${serviceName}</h2>`
+			let serviceHeader = `<h4>${serviceName}</h4></br>`
+			serviceAreaInfoDump.style.backgroundColor = "white"
+			serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
+
 			serviceAreaInfoDump.innerHTML += serviceHeader 
 			for (let i = 0; i < data[serviceName].length; ++i){
-				serviceAreaInfoDump.innerHTML += data[serviceName][i] // That feature content
+				serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>"// That feature content
 			}
 		}
 	})
@@ -682,8 +695,9 @@ function serviceArea(){
 		serviceLayerGroup.clearLayers();
   
 		// Add the source point
-		L.marker(curr_location.latlng).addTo(serviceStartPoints);
-  
+		
+		L.marker(curr_location.latlng, {icon: animatedIcon}).addTo(serviceStartPoints);
+		
 		// Make the API request
 		arcgisRest
 		  .serviceArea({
@@ -730,6 +744,11 @@ function serviceArea(){
 }
 serviceArea()
 
+let clearServiceAreaBtn = document.getElementById("clearService")
+clearServiceAreaBtn.onclick = function(){
+	serviceStartPoints.clearLayers();
+	serviceLayerGroup.clearLayers();
+}
 
 
 

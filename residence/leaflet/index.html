@@ -151,10 +151,10 @@
 
   <!--The tab Containers check tabination.css-->
   <div class = "toggle_container">
-    <button class="tablink" onclick="openPage('Table', this, 'red')">Data Table</button>
-    <button class="tablink" onclick="openPage('News', this, 'green')" id="defaultOpen">Flood Locator</button>
-    <button class="tablink" onclick="openPage('Contact', this, 'blue')">Service Content</button>
-    <button class="tablink" onclick="openPage('About', this, 'orange')">Instructions</button>
+    <button class="tablink" onclick="openPage('Table', this, '#4CAF50')">Data Table</button>
+        <button class="tablink" onclick="openPage('RouteLocator', this, '#4CAF50')" id="defaultOpen">Route Locator</button>
+        <button class="tablink" onclick="openPage('ServiceArea', this, '#4CAF50')">Service Area</button>
+        <button class="tablink" onclick="openPage('NotAvailable', this, '#4CAF50')">Not Available</button>
 
     <div id="Table" class="tabcontent">
     <h3>Table</h3>
@@ -162,22 +162,26 @@
     <!-- <p></p> -->
     </div>
 
-    <div id="News" class="tabcontent">
-      <h3>Route Finder</h3>
-      <button id="calc_route">Click Me</button>
-      <div id ="directions">No Directions inputed</div>
+    <div id="RouteLocator" class="tabcontent">
+      <h3>Route Locator</h3>
+      <p> Generates a route from current location to the nearest bus stop while avoiding lakes and rivers</p>
+      <br>
+      <button class="analysisBtns" id="calc_route">Click to Generate Route</button>
+      <p></p>
+      <br>
+      <div id ="directions"></div>
     </div>
 
-    <div id="Contact" class="tabcontent">
-    <h3>Service Area </h3>
-    <p>Double Click on the Map</p>
-    <p>We have 0-5 mins, 5-10mins and 10-15 mins service area</p>
-    <div id="servicedump"></div>
+    <div id="ServiceArea" class="tabcontent">
+        <h3>Service Area</h3>
+        <p>To generate 5, 10, 15 minutes service area, please double click on a location on the map.</p>
+        <button id="clearService" class="analysisBtns">Clear Service Area</button>
+        <div id="servicedump"></div>
     </div>
 
-    <div id="About" class="tabcontent">
-    <h3>Not yet Available</h3>
-    <p>Coming Soon...</p>
+    <div id="NotAvailable" class="tabcontent">
+        <h3>Not yet Available</h3>
+        <p>Coming Soon...</p>
     </div>
 </div>
 

@@ -4,7 +4,7 @@
   /* Style tab links */
  
   .toggle_container{ /* Change the container height*/
-      height: 40%;
+      height: 30%;
       border: 1px solid black;
       position: relative;
       top: -30%;
@@ -29,15 +29,42 @@
   /* Style the tab content (and add height:100% for full page content) */
   .tabcontent {
     color: black;
+    font-size: 18px;
     display: none;
-    padding: 100px 20px;
+    padding: 10px 20px;
     height: 100%;
   }
   
 
-  #Table {background-color: whitesmoke;}
-  #RouteLocator {background-color: whitesmoke;}
-  #Contact {background-color: whitesmoke;}
-  #About {background-color: whitesmoke;}
+  #Table {
+    background-color: whitesmoke;
+    overflow-y:auto;
+
+  }
+  #RouteLocator {
+    background-color: whitesmoke;
+    text-align: left;
+    overflow-y:auto !important;
+  }
+  #ServiceArea {
+    background-color: whitesmoke;
+    text-align: left;
+    overflow-y:auto;
+  }
+  #NotAvailable {
+    background-color: whitesmoke;
+    text-align: left;
+    overflow-y:auto;}
   
+
+  .analysisBtns {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
     /*************************************************************/
