@@ -71,19 +71,15 @@ const searchControl = L.esri.Geocoding.geosearch({
 
 var LeafIcon = L.Icon.extend({
 	options: {
-		shadowUrl: 
-			'http://leafletjs.com/docs/images/leaf-shadow.png',
-		iconSize:     [38, 95],
-		shadowSize:   [50, 64],
+		iconSize:     [25, 50],
 		iconAnchor:   [22, 94],
-		shadowAnchor: [4, 62],
 		popupAnchor:  [-3, -76]
 	}
 });
 
 // Use this to change the marker symbol
 var greenIcon = new LeafIcon({
-	iconUrl: '../image/location-tag-fixed.png'
+	iconUrl: '/images/location-tag-fixed.png'
 });
 
 // FeatureGroup might be similar to FeatureLayer in ArcGIS API for Javascript
@@ -372,26 +368,103 @@ function loadOnlineFeatLayers(){
 
 	let nameLayers = ["Huntsville Boundary", "Rivers", "Bus Stops", "Bus Routes", "Lakes and Rivers", "Historical Emergency Management Events"]
 	// let featureLayers = {} // Our Layers
+	let myStyle; 
+	// https://esri.github.io/esri-leaflet/examples/styling-feature-layer-points.html
 	for (let i = 0; i < huntsvilleLayers.length; i++){
-		  var newfeatureLayer = L.esri.featureLayer({
-				url: huntsvilleLayers[i],
-				// fields: // We get an array of fields
-		  });
-
-
+		let newfeatureLayer
+		
 		  // Binding the Popup template to the feature
 		  if (nameLayers[i] == "Bus Stops"){
+			var icon = L.icon({
+				iconUrl: 'js/images/bus_stops.png',
+				iconSize: [30, 50],
+				iconAnchor: [13.5, 17.5],
+				popupAnchor: [0, -11]
+			  });
+
+			newfeatureLayer = L.esri.featureLayer({
+				url: huntsvilleLayers[i],
+				pointToLayer: function (geojson, latlng) {
+					return L.marker(latlng, {
+					  icon: icon
+					});
+				  }
+				// fields: // We get an array of fields
+			  });
+
 			  newfeatureLayer.bindPopup(function (layer){
-				  
+					
 				let layer_name = `<h3>${nameLayers[i]}</h3>`
 				let properties = layer.feature.properties
 				let body = `<p> <strong>Stop Name:</strong> ${properties["Stop_Name"]}</p> 
 				<p><strong>Stop Number:</strong> ${properties["Stop_Num"]}</p>
 				`
 				return layer_name + body
-				// return L.Util.template('<h2>Bus Stops</h2><p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
-			});
+			})
 		  }
+		  else if(nameLayers[i] == "Huntsville Boundary"){
+			myStyle = {
+				"color": [74, 69, 0, 0.5],
+				"weight": 5,
+				"opacity": 0.65
+			}
+			newfeatureLayer = L.esri.featureLayer({
+				url: huntsvilleLayers[i],
+				style: myStyle
+				// fields: // We get an array of fields
+			  });
+		}
+		  else if(nameLayers[i] == "Bus Routes"){
+			myStyle = {
+				"color": "#A10A8A",
+				"weight": 5,
+				"opacity": 0.65
+			};
+			newfeatureLayer = L.esri.featureLayer({
+				url: huntsvilleLayers[i],
+				style: myStyle
+				// fields: // We get an array of fields
+			  });
+		  }
+		  else if(nameLayers[i] == "Historical Emergency Management Events"){
+			var icon = L.icon({
+				iconUrl: 'js/images/flag.png',
+				iconSize: [40, 50],
+				iconAnchor: [13.5, 17.5],
+				popupAnchor: [0, -11]
+			  });
+
+			newfeatureLayer = L.esri.featureLayer({
+				url: huntsvilleLayers[i],
+				pointToLayer: function (geojson, latlng) {
+					return L.marker(latlng, {
+					  icon: icon
+					});
+				  }
+				// fields: // We get an array of fields
+			  });
+			// newfeatureLayer.bindPopup(function(layer){
+			// 	let layer_name = `<h3>${nameLayers[i]}</h3>`
+			// 	let properties = layer.feature.properties
+			// 	console.log(properties)
+			// 	let body = `<p> <strong>Event Type:</strong> ${properties["EVENT_TYPE"]}</p> 
+			// 	<p><strong>District Number:</strong> ${properties["DISTRICT_N"]}</p>
+			// 	<p><strong>Event year:</strong> ${properties["EVENT_YEAR"]}</p>
+			// 	<p><strong>Event count:</strong> ${properties["EVENT_NUMB"]}</p>
+			// 	<p><strong>Evacuated ?:</strong> ${properties["EVACUATION"]}</p>
+			// 	<p><strong>Description:</strong> ${properties["EVENT_DESC"]}</p>
+			// 	`
+			// return layer_name + body
+			// // return L.Util.template('<h2>Bus Stops</h2><p>Stop Number <strong>{Stop_Num}<strong>. Stop Name {Stop_Name}.</p>', layer.feature.properties);
+			// });
+  		}
+		  else{
+			newfeatureLayer = L.esri.featureLayer({
+				url: huntsvilleLayers[i],
+				// fields: // We get an array of fields
+			  });
+		  }
+		  
 		  featureLayers[nameLayers[i]] = newfeatureLayer
 
 		  
@@ -456,7 +529,48 @@ function loadDBFeatures(){
 					// 	layerJson.geometry["type"] = "LineString"
 					// }
 					if (layerJson["type"] == "Feature"){ // temporary for now
-						L.geoJSON(layerJson).addTo(map)
+						let popUp = metaFormatHtml(layerJson.attributes)
+						let feature;
+						let myStyle
+						if (layerJson.attributes.Type == "line"){
+							myStyle = {
+								"color": "#D11349",
+								"weight": 5,
+								"opacity": 0.65
+							};
+							feature = L.geoJSON(layerJson, {
+								style: myStyle
+							})
+						}
+						else if (layerJson.attributes.Type == "polygon"){
+							myStyle = {
+								"color": "#FF7929",
+								"weight": 5,
+								"opacity": 0.65
+							};
+							feature = L.geoJSON(layerJson, {
+								style: myStyle
+							})
+						}
+						else{
+							let Icon = L.icon({
+								iconUrl: point_stylings.locator.url,		
+								iconSize:     [95, 95], // size of the icon
+								iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+								popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+							});
+							
+							// feature = L.geoJSON(layerJson,{icon: animatedIcon})
+							feature = L.geoJSON(layerJson, 
+								{pointToLayer: function(feature, latlng) {
+								return L.marker(latlng, {
+								  icon: greenIcon
+								});
+							  }})
+						
+						}
+						feature.addTo(map)
+						feature.bindPopup(popUp)
 					}
 					
 						// addClientFeatureLayer(featureTypes[i], featureListJson[k])

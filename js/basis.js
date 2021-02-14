@@ -227,7 +227,7 @@ let polyline_info = {
     },
     symbol:{
         type: "simple-line",
-        color: "#D11349", // Orange
+        color: "#D11349",
         width: 5
     },
     popupTemplate:popupTemplate_info
