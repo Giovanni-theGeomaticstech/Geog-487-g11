@@ -856,125 +856,125 @@ require([
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // SERIVICE AREA
-      const serviceAreaTask = new ServiceAreaTask({
-            url: "https://route.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea"
-      });
+//       // SERIVICE AREA
+//       const serviceAreaTask = new ServiceAreaTask({
+//             url: "https://route.arcgis.com/arcgis/rest/services/World/ServiceAreas/NAServer/ServiceArea_World/solveServiceArea"
+//       });
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////
-// Gathers Data from points in the Service area generated through VGI
-      function serviceAreaData(serviceFeatureCollection){
-            var serviceAreaInfoDump = document.getElementById("servicedump")
-            serviceAreaInfoDump.innerHTML = ""
+// ///////////////////////////////////////////////////////////////////////////////////////
+// // Gathers Data from points in the Service area generated through VGI
+//       function serviceAreaData(serviceFeatureCollection){
+//             var serviceAreaInfoDump = document.getElementById("servicedump")
+//             serviceAreaInfoDump.innerHTML = ""
 
-            // Here We are going to add in points from the VGI
-            let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
-            vgiFeaturesPromise.then(function(featuresList){
-                  let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
+//             // Here We are going to add in points from the VGI
+//             let vgiFeaturesPromise = listFeatures("residence", "point") // We just need the point data
+//             vgiFeaturesPromise.then(function(featuresList){
+//                   let data = pointsWithinPolygon(featuresList, serviceFeatureCollection) // A dictionary
 
-                  serviceAreaInfoDump.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-                  serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
+//                   serviceAreaInfoDump.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+//                   serviceAreaInfoDump.style.padding = "15px 15px 15px 30px";
                   
-                  for (let serviceName in data){
-                        let serviceHeader = `<h4>${serviceName}</h4></br>`
-                        serviceAreaInfoDump.innerHTML += serviceHeader 
-                        for (let i = 0; i < data[serviceName].length; ++i){
-                              serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>" // That feature content
-                        }
-                  }
-            })
-      }
-///////////////////////////////////////////////////////////////////////////////////////
-      // Execute the Service Area Task
+//                   for (let serviceName in data){
+//                         let serviceHeader = `<h4>${serviceName}</h4></br>`
+//                         serviceAreaInfoDump.innerHTML += serviceHeader 
+//                         for (let i = 0; i < data[serviceName].length; ++i){
+//                               serviceAreaInfoDump.innerHTML += data[serviceName][i] + "</br>" // That feature content
+//                         }
+//                   }
+//             })
+//       }
+// ///////////////////////////////////////////////////////////////////////////////////////
+//       // Execute the Service Area Task
       
-      function executeServiceAreaTask(serviceAreaParams) {
+//       function executeServiceAreaTask(serviceAreaParams) {
 
-            return serviceAreaTask.solve(serviceAreaParams)
-              .then(function(result){
-                if (result.serviceAreaPolygons.length) {                  
-                  // Draw each service area polygon
-                  result.serviceAreaPolygons.forEach(function(graphic){
-                  graphic.symbol = {
-                  type: "simple-fill",
-                  color: "rgba(255,50,50,.25)"
-                  }
-                  view.graphics.add(graphic,0);
-                  });
-                  let serviceAreaPolygons = result.serviceAreaPolygons
-                  return serviceAreaPolygons // Here we return the service area polygons
-                }
-              }, function(error){
-            //     console.log(error);
-                alert("Error in Service Area Calculation")
-              });
+//             return serviceAreaTask.solve(serviceAreaParams)
+//               .then(function(result){
+//                 if (result.serviceAreaPolygons.length) {                  
+//                   // Draw each service area polygon
+//                   result.serviceAreaPolygons.forEach(function(graphic){
+//                   graphic.symbol = {
+//                   type: "simple-fill",
+//                   color: "rgba(255,50,50,.25)"
+//                   }
+//                   view.graphics.add(graphic,0);
+//                   });
+//                   let serviceAreaPolygons = result.serviceAreaPolygons
+//                   return serviceAreaPolygons // Here we return the service area polygons
+//                 }
+//               }, function(error){
+//             //     console.log(error);
+//                 alert("Error in Service Area Calculation")
+//               });
     
-      }
+//       }
       
-      // Create Service Area Params
-      function createServiceAreaParams(locationGraphic, driveTimeCutoffs, outSpatialReference) {
+//       // Create Service Area Params
+//       function createServiceAreaParams(locationGraphic, driveTimeCutoffs, outSpatialReference) {
 
-            // Create one or more locations (facilities) to solve for
-            const featureSet = new FeatureSet({
-              features: [locationGraphic]
-            });
+//             // Create one or more locations (facilities) to solve for
+//             const featureSet = new FeatureSet({
+//               features: [locationGraphic]
+//             });
 
-            // Set all of the input parameters for the service
-            const taskParameters = new ServiceAreaParams({
-                  facilities: featureSet,
-                  defaultBreaks: driveTimeCutoffs,
-                  trimOuterPolygon: true,
-                  outSpatialReference: outSpatialReference
-            });
-            return taskParameters;
+//             // Set all of the input parameters for the service
+//             const taskParameters = new ServiceAreaParams({
+//                   facilities: featureSet,
+//                   defaultBreaks: driveTimeCutoffs,
+//                   trimOuterPolygon: true,
+//                   outSpatialReference: outSpatialReference
+//             });
+//             return taskParameters;
     
-      }
+//       }
 
 
-      // The function to generate the point (location of interests) when one double clicks on the map
-      // It will call sericeAreaData to generate data for the service area
-      function serviceArea(){
-            view.on("double-click", function(event){
-                  const locationGraphic = addPointGraphic("point", event.mapPoint, "service")
+//       // The function to generate the point (location of interests) when one double clicks on the map
+//       // It will call sericeAreaData to generate data for the service area
+//       function serviceArea(){
+//             view.on("double-click", function(event){
+//                   const locationGraphic = addPointGraphic("point", event.mapPoint, "service")
 
-                  const driveTimeCutoffs = [5,10,15]; // Minutes
-                  // Create the Service Srea Params
-                  const serviceAreaParams = createServiceAreaParams(locationGraphic, driveTimeCutoffs, view.spatialReference);
+//                   const driveTimeCutoffs = [5,10,15]; // Minutes
+//                   // Create the Service Srea Params
+//                   const serviceAreaParams = createServiceAreaParams(locationGraphic, driveTimeCutoffs, view.spatialReference);
                   
-                  let serviceAreaFeatures = executeServiceAreaTask(serviceAreaParams); // Execute the Service area
-                  serviceAreaFeatures.then(function(features){
-                        for (let i = 0; i < features.length; i++){
-                              let featureJSON = features[i].toJSON()
-                              // Changing it to feature geojson
+//                   let serviceAreaFeatures = executeServiceAreaTask(serviceAreaParams); // Execute the Service area
+//                   serviceAreaFeatures.then(function(features){
+//                         for (let i = 0; i < features.length; i++){
+//                               let featureJSON = features[i].toJSON()
+//                               // Changing it to feature geojson
                               
-                              featureJSON.properties = featureJSON.attributes
-                              featureJSON.type = "Feature"
+//                               featureJSON.properties = featureJSON.attributes
+//                               featureJSON.type = "Feature"
                               
-                              featureJSON.geometry = {
-                                    coordinates: featureJSON.geometry.rings,
-                                    type:"Polygon"
-                              }
-                              delete featureJSON.attributes
-                              delete featureJSON.popupTemplate
-                              delete featureJSON.symbol
-                              features[i] = featureJSON
-                        }
-                        // Changing it to Turf FeatureCollection
-                        let featureCollection = turf.featureCollection(features)
-                        serviceAreaData(featureCollection)
-                  }) // Closing for ServiceAreaFeatures
+//                               featureJSON.geometry = {
+//                                     coordinates: featureJSON.geometry.rings,
+//                                     type:"Polygon"
+//                               }
+//                               delete featureJSON.attributes
+//                               delete featureJSON.popupTemplate
+//                               delete featureJSON.symbol
+//                               features[i] = featureJSON
+//                         }
+//                         // Changing it to Turf FeatureCollection
+//                         let featureCollection = turf.featureCollection(features)
+//                         serviceAreaData(featureCollection)
+//                   }) // Closing for ServiceAreaFeatures
                   
-            })
-      }
-      serviceArea()
+//             })
+//       }
+//       serviceArea()
 
-      let clearServiceAreaBtn = document.getElementById("clearService")
+//       let clearServiceAreaBtn = document.getElementById("clearService")
       
-      clearServiceAreaBtn.onclick = function(){
-            view.graphics.removeAll()
-      }
+//       clearServiceAreaBtn.onclick = function(){
+//             view.graphics.removeAll()
+//       }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   }

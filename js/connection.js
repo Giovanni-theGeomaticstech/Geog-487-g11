@@ -39,7 +39,6 @@ import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeatur
 
 
 
-
 // firebaseInfo.then(function(firebaseConfig){
   
 // })

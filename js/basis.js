@@ -30,7 +30,7 @@ const fields = [
     },
     {
       name: "Data_added",
-      alias: "date",
+      alias: "Date",
       type: "date"
     },
     {
@@ -40,7 +40,7 @@ const fields = [
     },
     {
       name: "Description",
-      alias: "description",
+      alias: "Description",
       type: "string"
     }
   ]
