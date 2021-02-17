@@ -12,6 +12,8 @@
 
 ### Applications
 - `FloodPlains Mapped Huntsville` (Link to Application)[https://huntsville-proj.web.app/]
+- `Note running the application by just opening index.html will not render correctly`
+- `Either use the hosting link provided above` or (`Use Visual studio code` and get the `Live Server extension by Ritwick Dey`)
     - Files Last edited: February 16, 2021
     - Technologies used
         1. Google Firebase (Database and Hosting)

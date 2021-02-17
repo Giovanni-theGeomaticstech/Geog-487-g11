@@ -11,45 +11,14 @@
 // https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04
 // Promises Javascript
 // https://stackoverflow.com/questions/38884522/why-is-my-asynchronous-function-returning-promise-pending-instead-of-a-val
-// make sure we do sudo npm install -g firebase-tools
-// firebase login
-// firebase init
-
 
 
 import { addFeature, loadFeatures, loadfeatureIDs, deleteDbFeature, updateFeature } from './database.js'
 
-// function firebaseConfigKey(){
-//   let file = "../../../firebase.env"
-//   let data = fetch (file).then(x => x.text()).then(function(data){
-//         let data_cleaned = data.split("\n")
-//         let firebaseConfig = {}
-//         for (let i =0 ; i < data_cleaned.length; i++){
-//           let info = data_cleaned[i].split("=")
-//           firebaseConfig[info[0]] = info[1]
-//         }
-//         console.log(firebaseConfig)
-//         return firebaseConfig
-//    })
-//   return data
-// }
-// let firebaseInfo = firebaseConfigKey()
 
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyASl3akZm0lj3Rh_hLhMydxhOs52NONH7E",
-  authDomain: "huntsville-proj.firebaseapp.com",
-  databaseURL: "https://huntsville-proj-default-rtdb.firebaseio.com",
-  projectId: "huntsville-proj",
-  storageBucket: "huntsville-proj.appspot.com",
-  messagingSenderId: "332679935283",
-  appId: "1:332679935283:web:a7ba6b4deea0c97f317a46",
-  measurementId: "G-S6VBDD8DQ4"
-};
 
-
-// firebaseInfo.then(function(firebaseConfig){
   
 // })
   // Initialize Firebase
@@ -174,14 +143,6 @@ export function updateExistingFeature(user_type, featureID, feature, type_featur
 })
 }
 
-// let test_geom = {"ObjectID":15, "geometry":
-// {
-//   "type":"polygon",
-//   "x":2009,
-//   "y":4
-// }
-// }
-// updateExistingFeature("residence", 15, test_geom)
 
 
 ///////////////////////////////////////////////////////////////////////////////////
