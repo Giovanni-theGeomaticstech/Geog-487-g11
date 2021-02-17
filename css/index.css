@@ -19,7 +19,7 @@ body, html {
 .container {
     position: relative;
     left: 30%; /* Pushes value to right */
-    top: 25%; /* Pushes value to right */
+    top: 10%; /* Pushes value to right */
 
     text-align: center;
     background-color: whitesmoke;
@@ -83,3 +83,21 @@ a .layout-box:hover{
     background-color: #49E20E;
 }
 /**********************************************************/
+
+/* User Cards*/
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 15%;
+    position: relative;
+    display: inline-block;
+    top: 12%;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
+  
+  .containered {
+    padding: 2px 16px;
+  }
